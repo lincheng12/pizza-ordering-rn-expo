@@ -7,6 +7,7 @@ import SettingsScreen from "../screens/SettingsScreen";
 import useThemePreference from "../hooks/useThemePreference";
 import { DarkTheme, LightTheme } from "../assets/Colors";
 import { headerTitleStyle } from "../assets/Styles";
+import PizzaSelectionDetailsScreen from "../screens/PizzaSelectionDetailsScreen";
 
 const Stack = createStackNavigator();
 
@@ -17,20 +18,22 @@ const AppStack = () => {
     <NavigationContainer
       theme={themePreference === "dark" ? DarkTheme : LightTheme}>
       <StatusBar style={themePreference === "dark" ? "light" : "dark"} />
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerTitleStyle: headerTitleStyle,
+          headerBackTitle: "Back",
+        }}>
         <Stack.Screen
           name="AppTabs"
           component={AppTabNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            headerTitleStyle: headerTitleStyle,
-            headerBackTitle: "Back",
-          }}
+          name="PizzaSelectionDetails"
+          component={PizzaSelectionDetailsScreen}
+          options={{ headerTitle: "Pizza Details" }}
         />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

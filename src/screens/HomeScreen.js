@@ -14,6 +14,7 @@ import { pizzData } from "../assets/pizza_data";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { Foundation } from "@expo/vector-icons";
 import AppTouchable from "../components/AppTouchable";
+import PizzaCard from "../components/PizzaCard";
 
 const HomeScreen = () => {
   const { colors } = useTheme();
@@ -22,7 +23,7 @@ const HomeScreen = () => {
     <AppView style={{ flex: 1 }}>
       <View style={styles.headerTopContainer}>
         <AppText style={styles.heading}>Start your order:</AppText>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => nav.navigate("PizzaSelectionDetails")}>
           <AppText
             style={{
               color: colors.primary,
@@ -40,34 +41,21 @@ const HomeScreen = () => {
           contentContainerStyle={{ paddingVertical: 2 }}
           style={{ flex: 1 }}>
           {pizzData.map((item, index) => (
-            <AppTouchable key={index}>
-              <View
-                style={[
-                  styles.pizzaCardContainer,
-                  shadowStyle,
-                  { backgroundColor: colors.card },
-                ]}>
-                <Image
-                  resizeMode="cover"
-                  style={styles.pizzaImage}
-                  source={{ uri: item.image }}
-                />
-                <View style={styles.titleAndPriceContainer}>
-                  <AppText numberOfLines={1} style={styles.pizzaName}>
-                    {item.name}
-                  </AppText>
-                  <AppText
-                    style={styles.pizzaPrice}>{`$${item.price}.00`}</AppText>
-                </View>
-                <AppText style={styles.ingredientsText}>Ingredients:</AppText>
-                <AppText
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ marginLeft: 5, fontSize: 11.5 }}>
-                  {item.ingredients.join(", ")}
-                </AppText>
-              </View>
-            </AppTouchable>
+            <PizzaCard
+              key={index}
+              pizzaCardContainerStyle={{
+                height: "100%",
+                width: 200,
+                marginHorizontal: 3,
+              }}
+              pizzaImageStyle={{ width: 200, height: "65%" }}
+              image={item.image}
+              name={item.name}
+              price={item.price}
+              ingredients={item.ingredients}
+              numberOfLines={1}
+              onPress={() => console.log(index)}
+            />
           ))}
           <AppTouchable>
             <View
@@ -135,41 +123,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingVertical: 10,
     paddingLeft: 8,
-  },
-  pizzaCardContainer: {
-    height: "100%",
-    marginHorizontal: 3,
-    width: 200,
-    borderRadius: 10,
-  },
-  pizzaImage: {
-    width: 200,
-    height: "65%",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  titleAndPriceContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 5,
-  },
-  pizzaName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: Platform.OS === "ios" ? "2%" : 0,
-    width: "65%",
-  },
-  pizzaPrice: {
-    fontSize: 13,
-    marginTop: Platform.OS === "ios" ? "2%" : 0,
-  },
-  ingredientsText: {
-    fontSize: 12,
-    marginTop: Platform.OS === "ios" ? "3%" : "1.5%",
-    marginBottom: Platform.OS === "ios" ? "1.5%" : "1%",
-    marginLeft: 5,
-    fontWeight: "bold",
   },
   diyCard: {
     flex: 1,
