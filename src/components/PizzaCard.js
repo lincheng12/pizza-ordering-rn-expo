@@ -4,6 +4,7 @@ import AppText from "./AppText";
 import { shadowStyle } from "../assets/Styles";
 import { useTheme } from "@react-navigation/native";
 import AppTouchable from "./AppTouchable";
+import { formatPrice } from "../lib/helper";
 
 const PizzaCard = (props) => {
   const { colors } = useTheme();
@@ -25,11 +26,9 @@ const PizzaCard = (props) => {
           <AppText {...props} style={[styles.name, props.pizzaNameStyle]}>
             {props.name}
           </AppText>
-          <AppText
-            style={[
-              styles.price,
-              props.pizzaPriceStyle,
-            ]}>{`+$${props.price}.00`}</AppText>
+          <AppText style={[styles.price, props.pizzaPriceStyle]}>
+            +{formatPrice(props.price)}
+          </AppText>
         </View>
         <AppText
           style={[

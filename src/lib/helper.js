@@ -11,3 +11,18 @@ export const removeValue = async (itemKey) => {
     console.err("Problem removing key from async storage: ", err);
   }
 };
+
+/**
+ * Capitalize the first letter in a word
+ * @param {string} string
+ * @returns Capitalize word
+ */
+export const capitalize = (string) =>
+  string.charAt(0).toUpperCase() + string.slice(1);
+
+/**
+ * Takes a number and add dollar sign and trailing zero
+ * @param {number} price
+ * @returns correctly formatted price
+ */
+export const formatPrice = (price) => `$${price}.00`;

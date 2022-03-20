@@ -4,12 +4,13 @@ import AppView from "../components/AppView";
 import { pizzData } from "../assets/pizza_data";
 import PizzaCard from "../components/PizzaCard";
 import AppTouchable from "../components/AppTouchable";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { shadowStyle } from "../assets/Styles";
 import { Foundation } from "@expo/vector-icons";
 
 const PizzaSelectionDetailsScreen = () => {
   const { colors } = useTheme();
+  const nav = useNavigation();
   return (
     <AppView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: 2 }}>
@@ -51,7 +52,7 @@ const PizzaSelectionDetailsScreen = () => {
             name={item.name}
             price={item.price}
             ingredients={item.ingredients}
-            onPress={() => console.log(index)}
+            onPress={() => nav.navigate("ConfigurePizza", { item })}
           />
         ))}
       </ScrollView>

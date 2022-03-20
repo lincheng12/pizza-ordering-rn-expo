@@ -9,11 +9,13 @@ const AppTouchable = (props) => {
   return (
     <>
       {Platform.OS === "android" ? (
-        <TouchableNativeFeedback {...props}>
+        <TouchableNativeFeedback activeOpacity={0.7} {...props}>
           {props.children}
         </TouchableNativeFeedback>
       ) : (
-        <TouchableOpacity {...props}>{props.children}</TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.7} {...props}>
+          {props.children}
+        </TouchableOpacity>
       )}
     </>
   );

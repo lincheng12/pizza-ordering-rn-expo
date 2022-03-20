@@ -54,7 +54,7 @@ const HomeScreen = () => {
               price={item.price}
               ingredients={item.ingredients}
               numberOfLines={1}
-              onPress={() => console.log(index)}
+              onPress={() => nav.navigate("ConfigurePizza", { item })}
             />
           ))}
           <AppTouchable>
