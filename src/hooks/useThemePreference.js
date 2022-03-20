@@ -8,9 +8,7 @@ export const ThemeProvider = ({ children }) => {
   const scheme = useColorScheme();
   const [themePreference, setThemePreference] = useState(scheme);
   const [themeName, setThemeName] = useState("device");
-  const [loadingTheme, setLoadingTheme] = useState(false);
 
-  //runtime change global theme
   useEffect(() => {
     const getThemeValue = async () => {
       const value = await AsyncStorage.getItem("@theme_preference");
@@ -30,19 +28,16 @@ export const ThemeProvider = ({ children }) => {
       }
     };
 
-    getThemeValue()
-      .catch((err) => console.log("async storage fetching: ", err))
-      .finally(() => setLoadingTheme(false));
-  }, [themePreference]);
+    getThemeValue().catch((err) =>
+      console.log("async storage fetching: ", err)
+    );
+  }, []);
 
   /**
    * Change context provider local theme state
    * @param {string} value - theme name
    */
-  const updateGlobalThemePreference = (value) => {
-    setThemePreference(value);
-    setLoadingTheme(true);
-  };
+  const updateGlobalThemePreference = (value) => setThemePreference(value);
 
   return (
     <ThemeContext.Provider
@@ -50,7 +45,6 @@ export const ThemeProvider = ({ children }) => {
         themePreference,
         themeName,
         updateGlobalThemePreference,
-        loadingTheme,
       }}>
       {children}
     </ThemeContext.Provider>
