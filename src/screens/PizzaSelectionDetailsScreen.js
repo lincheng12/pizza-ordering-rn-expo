@@ -5,7 +5,7 @@ import { pizzData } from "../assets/pizza_data";
 import PizzaCard from "../components/PizzaCard";
 import AppTouchable from "../components/AppTouchable";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { shadowStyle } from "../assets/Styles";
+import { scale, shadowStyle, verticalScale } from "../assets/Styles";
 import { Foundation } from "@expo/vector-icons";
 
 const PizzaSelectionDetailsScreen = () => {
@@ -13,7 +13,7 @@ const PizzaSelectionDetailsScreen = () => {
   const nav = useNavigation();
   return (
     <AppView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 2 }}>
+      <ScrollView contentContainerStyle={{ padding: scale(2) }}>
         <AppTouchable
           onPress={() => nav.navigate("ConfigurePizza", { startPrice: 6 })}>
           <View
@@ -28,28 +28,29 @@ const PizzaSelectionDetailsScreen = () => {
                 textAlign: "center",
                 fontWeight: "bold",
                 color: "white",
+                fontSize: scale(15),
               }}>
               Make your own pizza
             </Text>
-            <Text style={{ color: "white" }}>+$6.00</Text>
+            <Text style={{ color: "white", fontSize: scale(15) }}>+$6.00</Text>
           </View>
         </AppTouchable>
         {pizzData.map((item, index) => (
           <PizzaCard
             key={index}
             pizzaCardContainerStyle={{
-              height: 300,
+              height: verticalScale(260),
               width: "100%",
-              marginVertical: 3,
+              marginVertical: scale(3),
             }}
             pizzaImageStyle={{ width: "100%", height: "70%" }}
-            pizzaNameStyle={{ fontSize: 18 }}
-            pizzaPriceStyle={{ fontSize: 16 }}
+            pizzaNameStyle={{ fontSize: scale(18) }}
+            pizzaPriceStyle={{ fontSize: scale(16) }}
             ingredientsTextStyle={{
-              fontSize: 14,
+              fontSize: scale(14),
               marginTop: "1.3%",
             }}
-            ingredientsStyle={{ fontSize: 13 }}
+            ingredientsStyle={{ fontSize: scale(12) }}
             image={item.image}
             name={item.name}
             price={item.price}
@@ -69,9 +70,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    height: 100,
-    marginTop: 2,
-    marginBottom: 5,
+    height: verticalScale(90),
+    marginTop: scale(2),
+    marginBottom: scale(5),
     width: "100%",
     borderRadius: 10,
   },

@@ -14,7 +14,7 @@ import { menu } from "../assets/menu";
 import { RadioButton } from "react-native-paper";
 import { capitalize, formatPrice } from "../lib/helper";
 import { useTheme } from "@react-navigation/native";
-import { shadowStyle } from "../assets/Styles";
+import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import usePreviousState from "../hooks/usePreviousState";
@@ -89,19 +89,20 @@ const ConfigurePizzaScreen = ({ route }) => {
             style={{
               height: 140,
               width: "100%",
-              marginBottom: -10,
+              marginBottom: scale(-10),
             }}
             resizeMode="contain"
             source={require("../assets/pizza_backdrop.png")}
           />
         )}
-        <View style={{ marginLeft: 5, marginVertical: 3 }}>
+        <View style={{ marginLeft: scale(5), marginVertical: scale(3) }}>
           {item ? (
             <>
-              <AppText style={{ fontSize: 22, fontWeight: "bold" }}>
+              <AppText
+                style={{ fontSize: moderateScale(22), fontWeight: "bold" }}>
                 {item.name}
               </AppText>
-              <AppText style={{ color: colors.primary }}>
+              <AppText style={{ color: colors.primary, paddingTop: scale(2) }}>
                 {item.ingredients.join(", ")}
               </AppText>
             </>
@@ -112,10 +113,10 @@ const ConfigurePizzaScreen = ({ route }) => {
                 style={{
                   backgroundColor: colors.card,
                   height: 45,
-                  paddingVertical: 12,
-                  paddingHorizontal: 10,
+                  paddingVertical: scale(12),
+                  paddingHorizontal: scale(10),
                   color: colors.text,
-                  fontSize: 15,
+                  fontSize: moderateScale(15),
                   borderRadius: 10,
                 }}
                 placeholderTextColor={colors.text}
@@ -126,6 +127,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   style={{
                     color: colors.primary,
                     textTransform: "capitalize",
+                    paddingTop: scale(2),
                   }}>
                   {ingredients.join(", ")}
                 </AppText>
@@ -135,7 +137,7 @@ const ConfigurePizzaScreen = ({ route }) => {
             </>
           )}
         </View>
-        <View style={{ padding: 5 }}>
+        <View style={{ padding: scale(5) }}>
           {/* Pizza size type */}
           <AppText style={styles.selectionHeading}>Type:</AppText>
           {menu.type.map((choice, index) => (
@@ -149,7 +151,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   { backgroundColor: colors.card },
                   shadowStyle,
                 ]}>
-                <AppText style={{ marginLeft: 5 }}>
+                <AppText style={{ marginLeft: scale(5) }}>
                   {capitalize(choice.size)} {choice.diameter}'' ({choice.slices}{" "}
                   Slices)
                 </AppText>
@@ -179,7 +181,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   { backgroundColor: colors.card },
                   shadowStyle,
                 ]}>
-                <AppText style={{ marginLeft: 5 }}>
+                <AppText style={{ marginLeft: scale(5) }}>
                   {capitalize(choice.type)}
                 </AppText>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -207,7 +209,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                     { backgroundColor: colors.card },
                     shadowStyle,
                   ]}>
-                  <AppText style={{ marginLeft: 5 }}>
+                  <AppText style={{ marginLeft: scale(5) }}>
                     {capitalize(choice.type)}
                   </AppText>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -244,7 +246,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                     { backgroundColor: colors.card },
                     shadowStyle,
                   ]}>
-                  <AppText style={{ marginLeft: 5 }}>
+                  <AppText style={{ marginLeft: scale(5) }}>
                     {capitalize(choice.type)}
                   </AppText>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -323,7 +325,12 @@ const ConfigurePizzaScreen = ({ route }) => {
         </View>
         <TouchableOpacity
           style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
-          <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
+          <Text
+            style={{
+              color: "white",
+              fontSize: moderateScale(16),
+              fontWeight: "bold",
+            }}>
             {formatPrice(price)} (x{quantity}) Checkout
           </Text>
         </TouchableOpacity>
@@ -339,55 +346,55 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 5,
-    marginVertical: 2,
+    padding: scale(5),
+    marginVertical: scale(2),
     borderRadius: 10,
   },
   selectionHeading: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "bold",
-    marginVertical: 5,
-    marginTop: 10,
+    marginVertical: scale(5),
+    marginTop: scale(10),
   },
   circleButton: {
-    padding: 10,
+    padding: scale(10),
     borderRadius: 50,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
   checkoutButton: {
-    paddingVertical: 8,
+    paddingVertical: scale(8),
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
     width: "70%",
-    marginRight: 5,
+    marginRight: scale(5),
     flexDirection: "row",
     height: 45,
   },
   footer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: scale(8),
     justifyContent: "space-around",
   },
   circleButtonContainer: {
     flexDirection: "row",
-    width: 95,
+    width: moderateScale(95),
     justifyContent: "space-evenly",
   },
   quantityContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: scale(10),
   },
   quantityText: {
     borderWidth: 1,
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    marginHorizontal: 8,
+    paddingVertical: scale(10),
+    paddingHorizontal: scale(18),
+    marginHorizontal: scale(8),
   },
 });

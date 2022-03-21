@@ -1,7 +1,7 @@
 import { StyleSheet, View, Platform, Image } from "react-native";
 import React from "react";
 import AppText from "./AppText";
-import { shadowStyle } from "../assets/Styles";
+import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import { useTheme } from "@react-navigation/native";
 import AppTouchable from "./AppTouchable";
 import { formatPrice } from "../lib/helper";
@@ -40,7 +40,10 @@ const PizzaCard = (props) => {
         </AppText>
         <AppText
           {...props}
-          style={[{ marginLeft: 5, fontSize: 11.5 }, props.ingredientsStyle]}>
+          style={[
+            { marginLeft: scale(5), fontSize: moderateScale(11.5) },
+            props.ingredientsStyle,
+          ]}>
           {props.ingredients.join(", ")}
         </AppText>
       </View>
@@ -63,23 +66,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 5,
+    paddingHorizontal: scale(5),
   },
   name: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "bold",
     marginTop: Platform.OS === "ios" ? "2%" : 0,
     width: "65%",
   },
   price: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     marginTop: Platform.OS === "ios" ? "2%" : 0,
   },
   ingredientsText: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     marginTop: Platform.OS === "ios" ? "3%" : "1.5%",
     marginBottom: Platform.OS === "ios" ? "1.5%" : "1%",
-    marginLeft: 5,
+    marginLeft: scale(5),
     fontWeight: "bold",
   },
 });

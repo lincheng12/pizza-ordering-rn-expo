@@ -5,7 +5,7 @@ import useThemePreference from "../hooks/useThemePreference";
 import { useTheme } from "@react-navigation/native";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
-import { sWidth } from "../assets/Styles";
+import { moderateScale, scale, sWidth } from "../assets/Styles";
 import { RadioButton } from "react-native-paper";
 
 const SettingsScreen = () => {
@@ -91,14 +91,14 @@ export default SettingsScreen;
 
 const styles = StyleSheet.create({
   changeThemeHeader: {
-    paddingLeft: 10,
+    paddingLeft: scale(10),
     fontWeight: "bold",
-    fontSize: 17,
-    marginVertical: 6,
+    fontSize: moderateScale(17),
+    marginVertical: scale(6),
   },
   changeThemeFooter: {
-    padding: 10,
-    marginLeft: 5,
+    padding: scale(10),
+    marginLeft: scale(5),
   },
   radioItemStyle: {
     borderBottomWidth: 1,

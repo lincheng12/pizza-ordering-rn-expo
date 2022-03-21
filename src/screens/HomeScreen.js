@@ -9,7 +9,7 @@ import {
 import React from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
-import { shadowStyle, wHeight } from "../assets/Styles";
+import { moderateScale, scale, shadowStyle, wHeight } from "../assets/Styles";
 import { pizzData } from "../assets/pizza_data";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { Foundation } from "@expo/vector-icons";
@@ -27,8 +27,8 @@ const HomeScreen = () => {
           <AppText
             style={{
               color: colors.primary,
-              marginRight: 8,
-              fontSize: 14.5,
+              marginRight: scale(8),
+              fontSize: scale(14.5),
             }}>
             View in details
           </AppText>
@@ -45,10 +45,10 @@ const HomeScreen = () => {
               key={index}
               pizzaCardContainerStyle={{
                 height: "100%",
-                width: 200,
-                marginHorizontal: 3,
+                width: moderateScale(200),
+                marginHorizontal: scale(3),
               }}
-              pizzaImageStyle={{ width: 200, height: "65%" }}
+              pizzaImageStyle={{ width: moderateScale(200), height: "65%" }}
               image={item.image}
               name={item.name}
               price={item.price}
@@ -70,7 +70,7 @@ const HomeScreen = () => {
                 style={{
                   textAlign: "center",
                   fontWeight: "bold",
-                  marginBottom: 3,
+                  marginBottom: scale(3),
                 }}>
                 Make your own pizza
               </AppText>
@@ -126,18 +126,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   heading: {
-    fontSize: 25,
+    fontSize: moderateScale(25),
     fontWeight: "bold",
-    paddingVertical: 10,
-    paddingLeft: 8,
+    paddingVertical: scale(10),
+    paddingLeft: scale(8),
   },
   diyCard: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
-    marginHorizontal: 3,
-    width: 120,
-    borderRadius: 10,
+    marginHorizontal: scale(3),
+    width: moderateScale(120),
+    borderRadius: scale(10),
   },
 });
