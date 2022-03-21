@@ -57,7 +57,8 @@ const HomeScreen = () => {
               onPress={() => nav.navigate("ConfigurePizza", { item })}
             />
           ))}
-          <AppTouchable>
+          <AppTouchable
+            onPress={() => nav.navigate("ConfigurePizza", { startPrice: 6 })}>
             <View
               style={[
                 styles.diyCard,
@@ -65,9 +66,15 @@ const HomeScreen = () => {
                 shadowStyle,
               ]}>
               <Foundation name="plus" size={24} color={colors.primary} />
-              <AppText style={{ textAlign: "center", fontWeight: "bold" }}>
+              <AppText
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  marginBottom: 3,
+                }}>
                 Make your own pizza
               </AppText>
+              <AppText>+$6.00</AppText>
             </View>
           </AppTouchable>
         </ScrollView>

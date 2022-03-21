@@ -14,7 +14,8 @@ const PizzaSelectionDetailsScreen = () => {
   return (
     <AppView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: 2 }}>
-        <AppTouchable>
+        <AppTouchable
+          onPress={() => nav.navigate("ConfigurePizza", { startPrice: 6 })}>
           <View
             style={[
               styles.diyCard,
@@ -30,6 +31,7 @@ const PizzaSelectionDetailsScreen = () => {
               }}>
               Make your own pizza
             </Text>
+            <Text style={{ color: "white" }}>+$6.00</Text>
           </View>
         </AppTouchable>
         {pizzData.map((item, index) => (

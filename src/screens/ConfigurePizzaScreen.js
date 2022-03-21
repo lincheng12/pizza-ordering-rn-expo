@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import AppView from "../components/AppView";
@@ -19,66 +20,137 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import usePreviousState from "../hooks/usePreviousState";
 
 const ConfigurePizzaScreen = ({ route }) => {
-  const { item } = route.params;
+  const { item, startPrice } = route.params;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const [size, setSize] = useState(null);
-  const [crustType, setCrustType] = useState(null);
+  const [sizeIndex, setSizeIndex] = useState(null);
+  const [crustIndex, setCrustIndex] = useState(null);
   const [quantity, setQuantity] = useState(0);
-  const [price, setPrice] = useState(item.price);
-  const prevSize = usePreviousState(size);
-  const prevCrustType = usePreviousState(crustType);
+  const [price, setPrice] = useState(item?.price | startPrice);
+  const [saucePicked, setSaucePicked] = useState([]);
+  const [toppingsPicked, setToppingsPicked] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const prevSizeIndex = usePreviousState(sizeIndex);
+  const prevCrustIndex = usePreviousState(crustIndex);
 
   useEffect(() => {
     let totalCost = price;
-    if (prevSize === "large") totalCost -= menu.type[1].extraCost;
-    else if (size === "large") totalCost += menu.type[1].extraCost;
+    const { type } = menu;
+
+    if (type[prevSizeIndex]?.size === "large")
+      totalCost -= type[prevSizeIndex].extraCost;
+    else if (type[sizeIndex]?.size === "large")
+      totalCost += type[sizeIndex].extraCost;
     setPrice(totalCost);
-  }, [size]);
+  }, [sizeIndex]);
 
   useEffect(() => {
     let totalCost = price;
-    if (prevCrustType === "stuffed") totalCost -= menu.crust[2].extraCost;
-    else if (crustType === "stuffed") totalCost += menu.crust[2].extraCost;
+    const { crust } = menu;
+
+    if (crust[prevCrustIndex]?.type === "stuffed")
+      totalCost -= crust[prevCrustIndex].extraCost;
+    else if (crust[crustIndex]?.type === "stuffed")
+      totalCost += crust[crustIndex].extraCost;
+
     setPrice(totalCost);
-  }, [crustType]);
+  }, [crustIndex]);
+
+  useEffect(() => {
+    const mappedSize = menu.type[sizeIndex]?.size;
+    const mappedCrust = menu.crust[crustIndex]?.type;
+    const mappedToppings = toppingsPicked.map(
+      (item) => menu.toppings[item].type
+    );
+    const mappedSauces = saucePicked.map((item) => menu.sauces[item].type);
+
+    let joinedResult;
+    if (mappedSize !== undefined && mappedCrust !== undefined)
+      joinedResult = [`${mappedSize} size`, `${mappedCrust} crust`].concat(
+        mappedToppings.concat(mappedSauces)
+      );
+    else joinedResult = mappedToppings.concat(mappedSauces);
+
+    setIngredients(joinedResult);
+  }, [sizeIndex, crustIndex, toppingsPicked, saucePicked]);
 
   return (
     <AppView style={{ flex: 1, paddingBottom: insets.bottom }}>
       <ScrollView style={{ flex: 1 }}>
-        <Image
-          resizeMode="cover"
-          style={{ width: "100%", height: 280 }}
-          source={{ uri: item?.image }}
-        />
+        {item ? (
+          <Image
+            resizeMode="cover"
+            style={{ width: "100%", height: 280 }}
+            source={{ uri: item?.image }}
+          />
+        ) : (
+          <Image
+            style={{
+              height: 140,
+              width: "100%",
+              marginBottom: -10,
+            }}
+            resizeMode="contain"
+            source={require("../assets/pizza_backdrop.png")}
+          />
+        )}
         <View style={{ marginLeft: 5, marginVertical: 3 }}>
-          <AppText style={{ fontSize: 22, fontWeight: "bold" }}>
-            {item.name}
-          </AppText>
-          <AppText style={{ color: colors.primary }}>
-            {item.ingredients.join(", ")}
-          </AppText>
+          {item ? (
+            <>
+              <AppText style={{ fontSize: 22, fontWeight: "bold" }}>
+                {item.name}
+              </AppText>
+              <AppText style={{ color: colors.primary }}>
+                {item.ingredients.join(", ")}
+              </AppText>
+            </>
+          ) : (
+            <>
+              <AppText style={styles.selectionHeading}>Name:</AppText>
+              <TextInput
+                style={{
+                  backgroundColor: colors.card,
+                  height: 45,
+                  paddingVertical: 12,
+                  paddingHorizontal: 10,
+                  color: colors.text,
+                  fontSize: 15,
+                  borderRadius: 10,
+                }}
+                placeholderTextColor={colors.text}
+                placeholder="Name of your custom pizza"
+              />
+              {ingredients.length !== 0 ? (
+                <AppText
+                  style={{
+                    color: colors.primary,
+                    textTransform: "capitalize",
+                  }}>
+                  {ingredients.join(", ")}
+                </AppText>
+              ) : (
+                <AppText style={{ color: colors.primary }}>Ingredients</AppText>
+              )}
+            </>
+          )}
         </View>
         <View style={{ padding: 5 }}>
           <AppText style={styles.selectionHeading}>Type:</AppText>
           {menu.type.map((choice, index) => (
-            <RadioButton.Group key={index} value={size} onValueChange={setSize}>
+            <RadioButton.Group
+              key={index}
+              value={sizeIndex}
+              onValueChange={setSizeIndex}>
               <View
                 style={[
                   styles.selectionContainer,
                   { backgroundColor: colors.card },
                   shadowStyle,
                 ]}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginLeft: 5,
-                  }}>
-                  <AppText>{capitalize(choice.size)} </AppText>
-                  <AppText>{choice.diameter}'' </AppText>
-                  <AppText>({choice.slices} Slices)</AppText>
-                </View>
+                <AppText style={{ marginLeft: 5 }}>
+                  {capitalize(choice.size)} {choice.diameter}'' ({choice.slices}{" "}
+                  Slices)
+                </AppText>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   {choice.extraCost && (
                     <AppText>+{formatPrice(choice.extraCost)}</AppText>
@@ -86,7 +158,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   <RadioButton.Android
                     uncheckedColor={colors.text}
                     color={colors.primary}
-                    value={choice.size}
+                    value={index}
                   />
                 </View>
               </View>
@@ -96,8 +168,8 @@ const ConfigurePizzaScreen = ({ route }) => {
           {menu.crust.map((choice, index) => (
             <RadioButton.Group
               key={index}
-              value={crustType}
-              onValueChange={setCrustType}>
+              value={crustIndex}
+              onValueChange={setCrustIndex}>
               <View
                 style={[
                   styles.selectionContainer,
@@ -114,15 +186,105 @@ const ConfigurePizzaScreen = ({ route }) => {
                   <RadioButton.Android
                     uncheckedColor={colors.text}
                     color={colors.primary}
-                    value={choice.type}
+                    value={index}
                   />
                 </View>
               </View>
             </RadioButton.Group>
           ))}
+          {startPrice && (
+            <>
+              <AppText style={styles.selectionHeading}>Toppings:</AppText>
+              {menu.toppings.map((choice, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.selectionContainer,
+                    { backgroundColor: colors.card },
+                    shadowStyle,
+                  ]}>
+                  <AppText style={{ marginLeft: 5 }}>
+                    {capitalize(choice.type)}
+                  </AppText>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <AppText>+{formatPrice(choice.cost)}</AppText>
+                    <RadioButton.Android
+                      uncheckedColor={colors.text}
+                      color={colors.primary}
+                      value={choice.type}
+                      status={
+                        toppingsPicked.includes(index) ? "checked" : "unchecked"
+                      }
+                      onPress={() => {
+                        if (!toppingsPicked.includes(index)) {
+                          setToppingsPicked((prev) => [...prev, index]);
+                          setPrice((prev) => prev + menu.toppings[index].cost);
+                        } else {
+                          setToppingsPicked((prev) =>
+                            prev.filter((item) => item !== index)
+                          );
+                          setPrice((prev) => prev - menu.toppings[index].cost);
+                        }
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
+              <AppText style={styles.selectionHeading}>Sauces:</AppText>
+              {menu.sauces.map((choice, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.selectionContainer,
+                    { backgroundColor: colors.card },
+                    shadowStyle,
+                  ]}>
+                  <AppText style={{ marginLeft: 5 }}>
+                    {capitalize(choice.type)}
+                  </AppText>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <AppText>+{formatPrice(choice.cost)}</AppText>
+                    <RadioButton.Android
+                      uncheckedColor={colors.text}
+                      color={colors.primary}
+                      value={choice.type}
+                      status={
+                        saucePicked.includes(index) ? "checked" : "unchecked"
+                      }
+                      onPress={() => {
+                        if (!saucePicked.includes(index)) {
+                          setSaucePicked((prev) => [...prev, index]);
+                          setPrice((prev) => prev + menu.sauces[index].cost);
+                        } else {
+                          setSaucePicked((prev) =>
+                            prev.filter((item) => item !== index)
+                          );
+                          setPrice((prev) => prev - menu.sauces[index].cost);
+                        }
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
+            </>
+          )}
           <View style={styles.quantityContainer}>
             <AppText style={styles.selectionHeading}>Quantity:</AppText>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <TouchableOpacity
+                disabled={quantity === 0}
+                onPress={() => setQuantity((prev) => prev - 1)}
+                style={[
+                  styles.circleButton,
+                  { backgroundColor: colors.card },
+                  shadowStyle,
+                ]}>
+                <AntDesign name="minus" size={24} color={colors.text} />
+              </TouchableOpacity>
+              <AppText
+                style={[styles.quantityText, { borderColor: colors.text }]}>
+                {quantity}
+              </AppText>
               <TouchableOpacity
                 onPress={() => setQuantity((prev) => prev + 1)}
                 style={[
@@ -131,19 +293,6 @@ const ConfigurePizzaScreen = ({ route }) => {
                   shadowStyle,
                 ]}>
                 <AntDesign name="plus" size={24} color={colors.text} />
-              </TouchableOpacity>
-              <AppText
-                style={[styles.quantityText, { borderColor: colors.text }]}>
-                {quantity}
-              </AppText>
-              <TouchableOpacity
-                onPress={() => setQuantity((prev) => prev - 1)}
-                style={[
-                  styles.circleButton,
-                  { backgroundColor: colors.card },
-                  shadowStyle,
-                ]}>
-                <AntDesign name="minus" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
           </View>
@@ -189,6 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginVertical: 5,
+    marginTop: 10,
   },
   circleButton: {
     padding: 10,

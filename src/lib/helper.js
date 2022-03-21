@@ -21,8 +21,17 @@ export const capitalize = (string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
 /**
- * Takes a number and add dollar sign and trailing zero
- * @param {number} price
+ * Takes a number and add dollar sign
+ * @param {number} num
  * @returns correctly formatted price
  */
-export const formatPrice = (price) => `$${price}.00`;
+export const formatPrice = (num) => {
+  const price = num.toString();
+  if (price.indexOf(".") > -1) {
+    const arr = price.split(".");
+    if (arr[1].length === 1) return `$${price}0`;
+    else return `$${price}`;
+  } else {
+    return `$${price}.00`;
+  }
+};
