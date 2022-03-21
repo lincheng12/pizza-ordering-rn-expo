@@ -25,7 +25,7 @@ const ConfigurePizzaScreen = ({ route }) => {
   const insets = useSafeAreaInsets();
   const [sizeIndex, setSizeIndex] = useState(null);
   const [crustIndex, setCrustIndex] = useState(null);
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(item?.price | startPrice);
   const [saucePicked, setSaucePicked] = useState([]);
   const [toppingsPicked, setToppingsPicked] = useState([]);
@@ -77,6 +77,7 @@ const ConfigurePizzaScreen = ({ route }) => {
   return (
     <AppView style={{ flex: 1, paddingBottom: insets.bottom }}>
       <ScrollView style={{ flex: 1 }}>
+        {/* if a pre-configure pizza is clicked, the pizza image will be shown  */}
         {item ? (
           <Image
             resizeMode="cover"
@@ -135,6 +136,7 @@ const ConfigurePizzaScreen = ({ route }) => {
           )}
         </View>
         <View style={{ padding: 5 }}>
+          {/* Pizza size type */}
           <AppText style={styles.selectionHeading}>Type:</AppText>
           {menu.type.map((choice, index) => (
             <RadioButton.Group
@@ -164,6 +166,7 @@ const ConfigurePizzaScreen = ({ route }) => {
               </View>
             </RadioButton.Group>
           ))}
+          {/* Pizza crust type */}
           <AppText style={styles.selectionHeading}>Choose Crust:</AppText>
           {menu.crust.map((choice, index) => (
             <RadioButton.Group
@@ -192,6 +195,7 @@ const ConfigurePizzaScreen = ({ route }) => {
               </View>
             </RadioButton.Group>
           ))}
+          {/* Custom pizza toppings option (will only display if custom pizza option is selected) */}
           {startPrice && (
             <>
               <AppText style={styles.selectionHeading}>Toppings:</AppText>
@@ -230,6 +234,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   </View>
                 </View>
               ))}
+              {/* Custom pizza sauces option */}
               <AppText style={styles.selectionHeading}>Sauces:</AppText>
               {menu.sauces.map((choice, index) => (
                 <View
@@ -268,36 +273,40 @@ const ConfigurePizzaScreen = ({ route }) => {
               ))}
             </>
           )}
-          <View style={styles.quantityContainer}>
-            <AppText style={styles.selectionHeading}>Quantity:</AppText>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity
-                disabled={quantity === 0}
-                onPress={() => setQuantity((prev) => prev - 1)}
-                style={[
-                  styles.circleButton,
-                  { backgroundColor: colors.card },
-                  shadowStyle,
-                ]}>
-                <AntDesign name="minus" size={24} color={colors.text} />
-              </TouchableOpacity>
-              <AppText
-                style={[styles.quantityText, { borderColor: colors.text }]}>
-                {quantity}
-              </AppText>
-              <TouchableOpacity
-                onPress={() => setQuantity((prev) => prev + 1)}
-                style={[
-                  styles.circleButton,
-                  { backgroundColor: colors.card },
-                  shadowStyle,
-                ]}>
-                <AntDesign name="plus" size={24} color={colors.text} />
-              </TouchableOpacity>
+          {/* quantity option */}
+          {sizeIndex !== null && crustIndex !== null && (
+            <View style={styles.quantityContainer}>
+              <AppText style={styles.selectionHeading}>Quantity:</AppText>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  disabled={quantity === 1}
+                  onPress={() => setQuantity((prev) => prev - 1)}
+                  style={[
+                    styles.circleButton,
+                    { backgroundColor: colors.card },
+                    shadowStyle,
+                  ]}>
+                  <AntDesign name="minus" size={24} color={colors.text} />
+                </TouchableOpacity>
+                <AppText
+                  style={[styles.quantityText, { borderColor: colors.text }]}>
+                  {quantity}
+                </AppText>
+                <TouchableOpacity
+                  onPress={() => setQuantity((prev) => prev + 1)}
+                  style={[
+                    styles.circleButton,
+                    { backgroundColor: colors.card },
+                    shadowStyle,
+                  ]}>
+                  <AntDesign name="plus" size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </ScrollView>
+      {/* bottom page container */}
       <View style={styles.footer}>
         <View style={styles.circleButtonContainer}>
           <TouchableOpacity
@@ -315,7 +324,7 @@ const ConfigurePizzaScreen = ({ route }) => {
         <TouchableOpacity
           style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
           <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-            {formatPrice(price)} Checkout
+            {formatPrice(price)} (x{quantity}) Checkout
           </Text>
         </TouchableOpacity>
       </View>
@@ -352,7 +361,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    flexGrow: 0.9,
+    width: "70%",
     marginRight: 5,
     flexDirection: "row",
     height: 45,
@@ -361,11 +370,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 8,
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   circleButtonContainer: {
     flexDirection: "row",
-    flexGrow: 0.1,
+    width: 95,
     justifyContent: "space-evenly",
   },
   quantityContainer: {

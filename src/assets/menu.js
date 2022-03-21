@@ -30,6 +30,10 @@ export const menu = {
       cost: 1.5,
     },
     {
+      type: "extra cheese",
+      cost: 1.5,
+    },
+    {
       type: "grilled chicken",
       cost: 1.5,
     },
