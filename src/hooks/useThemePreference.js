@@ -37,7 +37,10 @@ export const ThemeProvider = ({ children }) => {
    * Change context provider local theme state
    * @param {string} value - theme name
    */
-  const updateGlobalThemePreference = (value) => setThemePreference(value);
+  const updateGlobalThemePreference = (value) => {
+    setThemePreference(value);
+    setThemeName(value);
+  };
 
   return (
     <ThemeContext.Provider
