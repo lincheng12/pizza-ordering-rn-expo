@@ -89,6 +89,17 @@ const ConfigurePizzaScreen = ({ route }) => {
     }
   };
 
+  const handleAdd = () => {
+    console.log({
+      id: Date.now(),
+      pizzaBase: [sizeIndex, crustIndex],
+      pizzaTopping: toppingsPicked,
+      pizzaSauce: saucePicked,
+      quantity,
+      price,
+    });
+  };
+
   return (
     <AppView style={{ flex: 1, paddingBottom: insets.bottom }}>
       <ScrollView style={{ flex: 1 }}>
@@ -273,6 +284,7 @@ const ConfigurePizzaScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
+          onPress={handleAdd}
           style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
           <Text
             style={{
