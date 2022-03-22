@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Button } from "react-native";
+import { StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useThemePreference from "../hooks/useThemePreference";
 import { useTheme } from "@react-navigation/native";

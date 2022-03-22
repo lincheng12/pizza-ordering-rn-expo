@@ -10,7 +10,6 @@ import {
 import React, { useState, useEffect } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
-import AppTouchable from "../components/AppTouchable";
 import { menu } from "../assets/menu";
 import { RadioButton } from "react-native-paper";
 import { capitalize, formatPrice } from "../lib/helper";
@@ -19,6 +18,7 @@ import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import usePreviousState from "../hooks/usePreviousState";
+import RadioItemCard from "../components/RadioItemCard";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
@@ -60,25 +60,39 @@ const ConfigurePizzaScreen = ({ route }) => {
   useEffect(() => {
     const mappedSize = menu.type[sizeIndex]?.size;
     const mappedCrust = menu.crust[crustIndex]?.type;
-    const mappedToppings = toppingsPicked.map(
-      (item) => menu.toppings[item].type
+    const mappedToppings = toppingsPicked.map((item) =>
+      capitalize(menu.toppings[item].type)
     );
-    const mappedSauces = saucePicked.map((item) => menu.sauces[item].type);
+    const mappedSauces = saucePicked.map((item) =>
+      capitalize(menu.sauces[item].type)
+    );
 
     let joinedResult;
     if (mappedSize !== undefined && mappedCrust !== undefined)
-      joinedResult = [`${mappedSize} size`, `${mappedCrust} crust`].concat(
-        mappedToppings.concat(mappedSauces)
-      );
+      joinedResult = [
+        `${capitalize(mappedSize)} size`,
+        `${capitalize(mappedCrust)} crust`,
+      ].concat(mappedToppings.concat(mappedSauces));
     else joinedResult = mappedToppings.concat(mappedSauces);
 
     setIngredients(joinedResult);
   }, [sizeIndex, crustIndex, toppingsPicked, saucePicked]);
 
+  //For selecting toppings and sauces
+  const onItemSelect = (state, setState, menuItem, index) => {
+    if (!state.includes(index)) {
+      setState((prev) => [...prev, index]);
+      setPrice((prev) => prev + menuItem[index].cost);
+    } else {
+      setState((prev) => prev.filter((item) => item !== index));
+      setPrice((prev) => prev - menuItem[index].cost);
+    }
+  };
+
   return (
     <AppView style={{ flex: 1, paddingBottom: insets.bottom }}>
       <ScrollView style={{ flex: 1 }}>
-        {/* if a pre-configure pizza is clicked, the pizza image will be shown  */}
+        {/* if a pre-configured pizza is clicked, the pizza image will be shown  */}
         {item ? (
           <Image
             resizeMode="cover"
@@ -127,7 +141,6 @@ const ConfigurePizzaScreen = ({ route }) => {
                 <AppText
                   style={{
                     color: colors.primary,
-                    textTransform: "capitalize",
                     paddingTop: scale(2),
                   }}>
                   {ingredients.join(", ")}
@@ -142,146 +155,72 @@ const ConfigurePizzaScreen = ({ route }) => {
           {/* Pizza size type */}
           <AppText style={styles.selectionHeading}>Type:</AppText>
           {menu.type.map((choice, index) => (
-            <AppTouchable key={index} onPress={() => setSizeIndex(index)}>
-              <RadioButton.Group
-                key={index}
-                value={sizeIndex}
-                onValueChange={setSizeIndex}>
-                <View
-                  style={[
-                    styles.selectionContainer,
-                    { backgroundColor: colors.card },
-                    shadowStyle,
-                  ]}>
-                  <AppText style={{ marginLeft: scale(5) }}>
-                    {capitalize(choice.size)} {choice.diameter}'' (
-                    {choice.slices} Slices)
-                  </AppText>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {choice.extraCost && (
-                      <AppText>+{formatPrice(choice.extraCost)}</AppText>
-                    )}
-                    <RadioButton.Android
-                      uncheckedColor={colors.text}
-                      color={colors.primary}
-                      value={index}
-                      status={sizeIndex === index ? "checked" : "unchecked"}
-                    />
-                  </View>
-                </View>
-              </RadioButton.Group>
-            </AppTouchable>
+            <RadioButton.Group key={index}>
+              <RadioItemCard
+                onSelect={() => setSizeIndex(index)}
+                itemName={`${choice.size} ${choice.details}`}
+                itemPrice={choice.extraCost}
+                itemCheckedStatus={
+                  sizeIndex === index ? "checked" : "unchecked"
+                }
+              />
+            </RadioButton.Group>
           ))}
           {/* Pizza crust type */}
           <AppText style={styles.selectionHeading}>Choose Crust:</AppText>
           {menu.crust.map((choice, index) => (
-            <AppTouchable key={index} onPress={() => setCrustIndex(index)}>
-              <RadioButton.Group>
-                <View
-                  style={[
-                    styles.selectionContainer,
-                    { backgroundColor: colors.card },
-                    shadowStyle,
-                  ]}>
-                  <AppText style={{ marginLeft: scale(5) }}>
-                    {capitalize(choice.type)}
-                  </AppText>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {choice.extraCost && (
-                      <AppText>+{formatPrice(choice.extraCost)}</AppText>
-                    )}
-                    <RadioButton.Android
-                      uncheckedColor={colors.text}
-                      color={colors.primary}
-                      value={index}
-                      status={crustIndex === index ? "checked" : "unchecked"}
-                    />
-                  </View>
-                </View>
-              </RadioButton.Group>
-            </AppTouchable>
+            <RadioButton.Group key={index}>
+              <RadioItemCard
+                onSelect={() => setCrustIndex(index)}
+                itemName={choice.type}
+                itemPrice={choice.extraCost}
+                itemCheckedStatus={
+                  crustIndex === index ? "checked" : "unchecked"
+                }
+              />
+            </RadioButton.Group>
           ))}
           {/* Custom pizza toppings option (will only display if custom pizza option is selected) */}
           {startPrice && (
             <>
               <AppText style={styles.selectionHeading}>Toppings:</AppText>
               {menu.toppings.map((choice, index) => (
-                <AppTouchable
+                <RadioItemCard
                   key={index}
-                  onPress={() => {
-                    if (!toppingsPicked.includes(index)) {
-                      setToppingsPicked((prev) => [...prev, index]);
-                      setPrice((prev) => prev + menu.toppings[index].cost);
-                    } else {
-                      setToppingsPicked((prev) =>
-                        prev.filter((item) => item !== index)
-                      );
-                      setPrice((prev) => prev - menu.toppings[index].cost);
-                    }
-                  }}>
-                  <View
-                    style={[
-                      styles.selectionContainer,
-                      { backgroundColor: colors.card },
-                      shadowStyle,
-                    ]}>
-                    <AppText style={{ marginLeft: scale(5) }}>
-                      {capitalize(choice.type)}
-                    </AppText>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}>
-                      <AppText>+{formatPrice(choice.cost)}</AppText>
-                      <RadioButton.Android
-                        uncheckedColor={colors.text}
-                        color={colors.primary}
-                        status={
-                          toppingsPicked.includes(index)
-                            ? "checked"
-                            : "unchecked"
-                        }
-                      />
-                    </View>
-                  </View>
-                </AppTouchable>
+                  onSelect={() =>
+                    onItemSelect(
+                      toppingsPicked,
+                      setToppingsPicked,
+                      menu.toppings,
+                      index
+                    )
+                  }
+                  itemName={choice.type}
+                  itemPrice={choice.cost}
+                  itemCheckedStatus={
+                    toppingsPicked.includes(index) ? "checked" : "unchecked"
+                  }
+                />
               ))}
               {/* Custom pizza sauces option */}
               <AppText style={styles.selectionHeading}>Sauces:</AppText>
               {menu.sauces.map((choice, index) => (
-                <AppTouchable
+                <RadioItemCard
                   key={index}
-                  onPress={() => {
-                    if (!saucePicked.includes(index)) {
-                      setSaucePicked((prev) => [...prev, index]);
-                      setPrice((prev) => prev + menu.sauces[index].cost);
-                    } else {
-                      setSaucePicked((prev) =>
-                        prev.filter((item) => item !== index)
-                      );
-                      setPrice((prev) => prev - menu.sauces[index].cost);
-                    }
-                  }}>
-                  <View
-                    style={[
-                      styles.selectionContainer,
-                      { backgroundColor: colors.card },
-                      shadowStyle,
-                    ]}>
-                    <AppText style={{ marginLeft: scale(5) }}>
-                      {capitalize(choice.type)}
-                    </AppText>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}>
-                      <AppText>+{formatPrice(choice.cost)}</AppText>
-                      <RadioButton.Android
-                        uncheckedColor={colors.text}
-                        color={colors.primary}
-                        status={
-                          saucePicked.includes(index) ? "checked" : "unchecked"
-                        }
-                      />
-                    </View>
-                  </View>
-                </AppTouchable>
+                  onSelect={() =>
+                    onItemSelect(
+                      saucePicked,
+                      setSaucePicked,
+                      menu.sauces,
+                      index
+                    )
+                  }
+                  itemName={choice.type}
+                  itemPrice={choice.cost}
+                  itemCheckedStatus={
+                    saucePicked.includes(index) ? "checked" : "unchecked"
+                  }
+                />
               ))}
             </>
           )}
@@ -352,14 +291,6 @@ const ConfigurePizzaScreen = ({ route }) => {
 export default ConfigurePizzaScreen;
 
 const styles = StyleSheet.create({
-  selectionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: scale(5),
-    marginVertical: scale(2),
-    borderRadius: 10,
-  },
   selectionHeading: {
     fontSize: moderateScale(18),
     fontWeight: "bold",

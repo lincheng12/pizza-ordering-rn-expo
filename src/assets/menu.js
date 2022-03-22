@@ -2,13 +2,11 @@ export const menu = {
   type: [
     {
       size: "small",
-      diameter: 10,
-      slices: 6,
+      details: '10" (6 slices)',
     },
     {
       size: "large",
-      diameter: 14,
-      slices: 10,
+      details: '14" (10 slices)',
       extraCost: 4,
     },
   ],

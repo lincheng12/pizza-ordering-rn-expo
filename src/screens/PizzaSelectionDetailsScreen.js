@@ -39,7 +39,7 @@ const PizzaSelectionDetailsScreen = () => {
           <PizzaCard
             key={index}
             pizzaCardContainerStyle={{
-              height: verticalScale(260),
+              height: 300,
               width: "100%",
               marginVertical: scale(3),
             }}
@@ -48,9 +48,9 @@ const PizzaSelectionDetailsScreen = () => {
             pizzaPriceStyle={{ fontSize: scale(16) }}
             ingredientsTextStyle={{
               fontSize: scale(14),
-              marginTop: "1.3%",
+              marginTop: "1%",
             }}
-            ingredientsStyle={{ fontSize: scale(12) }}
+            ingredientsStyle={{ fontSize: 12.5 }}
             image={item.image}
             name={item.name}
             price={item.price}
