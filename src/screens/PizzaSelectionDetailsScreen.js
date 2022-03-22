@@ -13,7 +13,7 @@ const PizzaSelectionDetailsScreen = () => {
   const nav = useNavigation();
   return (
     <AppView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: scale(2) }}>
+      <ScrollView contentContainerStyle={{ padding: scale(12) }}>
         <AppTouchable
           onPress={() => nav.navigate("ConfigurePizza", { startPrice: 6 })}>
           <View
@@ -41,7 +41,7 @@ const PizzaSelectionDetailsScreen = () => {
             pizzaCardContainerStyle={{
               height: 300,
               width: "100%",
-              marginVertical: scale(3),
+              marginVertical: scale(8),
             }}
             pizzaImageStyle={{ width: "100%", height: "70%" }}
             pizzaNameStyle={{ fontSize: scale(18) }}
