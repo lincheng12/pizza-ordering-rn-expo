@@ -1,4 +1,5 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   View,
@@ -19,6 +20,9 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import usePreviousState from "../hooks/usePreviousState";
 import RadioItemCard from "../components/RadioItemCard";
+import uuid from "react-native-uuid";
+import { useDispatch, useSelector } from "react-redux";
+import { addToBasket, selectItems } from "../redux/slices/basketSlice";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
@@ -33,6 +37,8 @@ const ConfigurePizzaScreen = ({ route }) => {
   const [ingredients, setIngredients] = useState([]);
   const prevSizeIndex = usePreviousState(sizeIndex);
   const prevCrustIndex = usePreviousState(crustIndex);
+  const pizzaItems = useSelector(selectItems);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let totalCost = price;
@@ -89,15 +95,38 @@ const ConfigurePizzaScreen = ({ route }) => {
     }
   };
 
-  const handleAdd = () => {
-    console.log({
-      id: Date.now(),
-      pizzaBase: [sizeIndex, crustIndex],
-      pizzaTopping: toppingsPicked,
-      pizzaSauce: saucePicked,
-      quantity,
-      price,
-    });
+  const addCustomPizza = () => {
+    if (
+      sizeIndex !== null &&
+      crustIndex !== null &&
+      toppingsPicked.length > 0 &&
+      saucePicked.length > 0
+    ) {
+      const item = {
+        id: uuid.v4(),
+        pizzaBase: [sizeIndex, crustIndex],
+        pizzaDetails: toppingsPicked.concat(saucePicked),
+        quantity,
+        price,
+      };
+      dispatch(addToBasket(item));
+      console.log(item);
+    } else Alert.alert("Cannot add empty items to the basket");
+  };
+
+  const addPrefiguredPizza = () => {
+    const ingredients = item.ingredients;
+    if (sizeIndex !== null && crustIndex !== null) {
+      const item = {
+        id: uuid.v4(),
+        pizzaBase: [sizeIndex, crustIndex],
+        pizzaDetails: ingredients,
+        quantity,
+        price,
+      };
+      dispatch(addToBasket(item));
+      console.log(item);
+    } else Alert.alert("Cannot add empty items to the basket");
   };
 
   return (
@@ -272,19 +301,40 @@ const ConfigurePizzaScreen = ({ route }) => {
       <View style={styles.footer}>
         <View style={styles.circleButtonContainer}>
           <TouchableOpacity
-            style={[
-              styles.circleButton,
-              { backgroundColor: colors.notification },
-            ]}>
+            style={[styles.circleButton, { backgroundColor: "#F08080" }]}>
             <AntDesign name="hearto" size={22} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.circleButton, { backgroundColor: colors.card }]}>
+            onPress={item ? addPrefiguredPizza : addCustomPizza}
+            style={[
+              styles.circleButton,
+              { backgroundColor: colors.card, position: "relative" },
+            ]}>
+            {pizzaItems.length !== 0 && (
+              <View
+                style={[
+                  {
+                    backgroundColor: colors.notification,
+                    width: 20,
+                    height: 20,
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    borderRadius: 20 / 2,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                  shadowStyle,
+                ]}>
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  {pizzaItems.length}
+                </Text>
+              </View>
+            )}
             <Ionicons name="basket" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity
-          onPress={handleAdd}
           style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
           <Text
             style={{
