@@ -11,19 +11,19 @@ export const basketSlice = createSlice({
     },
     increaseItemCount: (state, action) => {
       const index = state.items.findIndex(
-        (basketItem) => basketItem.id === action.payload.id
+        (basketItem) => basketItem.id === action.payload
       );
-      index.count += 1;
+      state.items[index].quantity += 1;
     },
     decreaseItemCount: (state, action) => {
       const index = state.items.findIndex(
-        (basketItem) => basketItem.id === action.payload.id
+        (basketItem) => basketItem.id === action.payload
       );
-      index.count -= 1;
+      state.items[index].quantity -= 1;
     },
     removeFromBasket: (state, action) => {
       const index = state.items.findIndex(
-        (basketItem) => basketItem.id === action.payload.id
+        (basketItem) => basketItem.id === action.payload
       );
       let newBasket = [...state.items];
       if (index >= 0) {
@@ -31,12 +31,14 @@ export const basketSlice = createSlice({
         newBasket.splice(index, 1);
       } else {
         console.warn(
-          `Can't remove product (id: ${action.payload.id}) as its not in the basket`
+          `Can't remove product (id: ${action.payload}) as its not in the basket`
         );
       }
       state.items = newBasket;
     },
-    clearBasket: () => {},
+    clearBasket: (state) => {
+      state.items = [];
+    },
   },
 });
 
@@ -48,5 +50,11 @@ export const {
   clearBasket,
 } = basketSlice.actions;
 export const selectItems = (state) => state.basket.items;
+export const selectTotal = (state) =>
+  state.basket.items
+    .map(({ quantity, price }) => quantity * price)
+    .reduce((total, cost) => total + cost, 0);
+export const selectTotalCount = (state) =>
+  state.basket.items.reduce((total, { quantity }) => total + quantity, 0);
 
 export default basketSlice.reducer;

@@ -28,6 +28,7 @@ const RadioItemCard = (props) => {
             uncheckedColor={colors.text}
             color={colors.primary}
             status={props.itemCheckedStatus}
+            onPress={props.onSelect}
           />
         </View>
       </View>

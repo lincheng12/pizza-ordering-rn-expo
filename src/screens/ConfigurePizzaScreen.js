@@ -13,8 +13,8 @@ import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { menu } from "../assets/menu";
 import { RadioButton } from "react-native-paper";
-import { capitalize, formatPrice } from "../lib/helper";
-import { useTheme } from "@react-navigation/native";
+import { capitalize, formatPrice, mapSauces, mapToppings } from "../lib/helper";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,23 +22,25 @@ import usePreviousState from "../hooks/usePreviousState";
 import RadioItemCard from "../components/RadioItemCard";
 import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
-import { addToBasket, selectItems } from "../redux/slices/basketSlice";
+import { addToBasket, selectTotalCount } from "../redux/slices/basketSlice";
+import QuantityCounter from "../components/QuantityCounter";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const [sizeIndex, setSizeIndex] = useState(null);
-  const [crustIndex, setCrustIndex] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [sizeIndex, setSizeIndex] = useState(0); //default small pizza size
+  const [crustIndex, setCrustIndex] = useState(0); //default regular crust
+  const [quantity, setQuantity] = useState(1); //default quantity start at 1
   const [price, setPrice] = useState(item?.price | startPrice);
   const [saucePicked, setSaucePicked] = useState([]);
   const [toppingsPicked, setToppingsPicked] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const prevSizeIndex = usePreviousState(sizeIndex);
   const prevCrustIndex = usePreviousState(crustIndex);
-  const pizzaItems = useSelector(selectItems);
+  const totalCount = useSelector(selectTotalCount);
   const dispatch = useDispatch();
+  const nav = useNavigation();
 
   useEffect(() => {
     let totalCost = price;
@@ -64,25 +66,15 @@ const ConfigurePizzaScreen = ({ route }) => {
   }, [crustIndex]);
 
   useEffect(() => {
-    const mappedSize = menu.type[sizeIndex]?.size;
-    const mappedCrust = menu.crust[crustIndex]?.type;
-    const mappedToppings = toppingsPicked.map((item) =>
-      capitalize(menu.toppings[item].type)
-    );
-    const mappedSauces = saucePicked.map((item) =>
-      capitalize(menu.sauces[item].type)
-    );
-
-    let joinedResult;
-    if (mappedSize !== undefined && mappedCrust !== undefined)
-      joinedResult = [
-        `${capitalize(mappedSize)} size`,
-        `${capitalize(mappedCrust)} crust`,
-      ].concat(mappedToppings.concat(mappedSauces));
-    else joinedResult = mappedToppings.concat(mappedSauces);
-
-    setIngredients(joinedResult);
-  }, [sizeIndex, crustIndex, toppingsPicked, saucePicked]);
+    if (item) {
+      setIngredients(item.ingredients.map((e) => capitalize(e)));
+    } else {
+      const mappedToppings = mapToppings(toppingsPicked);
+      const mappedSauces = mapSauces(saucePicked);
+      const joinedResult = mappedToppings.concat(mappedSauces);
+      setIngredients(joinedResult);
+    }
+  }, [toppingsPicked, saucePicked]);
 
   //For selecting toppings and sauces
   const onItemSelect = (state, setState, menuItem, index) => {
@@ -95,38 +87,36 @@ const ConfigurePizzaScreen = ({ route }) => {
     }
   };
 
-  const addCustomPizza = () => {
-    if (
-      sizeIndex !== null &&
-      crustIndex !== null &&
-      toppingsPicked.length > 0 &&
-      saucePicked.length > 0
-    ) {
+  const addPizza = () => {
+    const name = item?.name;
+    if (ingredients.length > 0) {
       const item = {
         id: uuid.v4(),
-        pizzaBase: [sizeIndex, crustIndex],
-        pizzaDetails: toppingsPicked.concat(saucePicked),
-        quantity,
-        price,
-      };
-      dispatch(addToBasket(item));
-      console.log(item);
-    } else Alert.alert("Cannot add empty items to the basket");
-  };
-
-  const addPrefiguredPizza = () => {
-    const ingredients = item.ingredients;
-    if (sizeIndex !== null && crustIndex !== null) {
-      const item = {
-        id: uuid.v4(),
+        pizzaName: name !== undefined ? name : "Custom Pizza",
         pizzaBase: [sizeIndex, crustIndex],
         pizzaDetails: ingredients,
         quantity,
         price,
       };
       dispatch(addToBasket(item));
-      console.log(item);
+      nav.goBack();
+      //console.log(item);
     } else Alert.alert("Cannot add empty items to the basket");
+  };
+
+  const checkoutSinglePizza = () => {
+    const name = item?.name;
+    if (ingredients.length > 0) {
+      const item = {
+        id: uuid.v4(),
+        pizzaName: name !== undefined ? name : "Custom Pizza",
+        pizzaBase: [sizeIndex, crustIndex],
+        pizzaDetails: ingredients,
+        quantity,
+        price,
+      };
+      nav.navigate("Checkout", { item, type: "single" });
+    } else Alert.alert("Cannot checkout empty items");
   };
 
   return (
@@ -157,9 +147,6 @@ const ConfigurePizzaScreen = ({ route }) => {
                 style={{ fontSize: moderateScale(22), fontWeight: "bold" }}>
                 {item.name}
               </AppText>
-              <AppText style={{ color: colors.primary, paddingTop: scale(2) }}>
-                {item.ingredients.join(", ")}
-              </AppText>
             </>
           ) : (
             <>
@@ -177,18 +164,18 @@ const ConfigurePizzaScreen = ({ route }) => {
                 placeholderTextColor={colors.text}
                 placeholder="Name of your custom pizza"
               />
-              {ingredients.length !== 0 ? (
-                <AppText
-                  style={{
-                    color: colors.primary,
-                    paddingTop: scale(2),
-                  }}>
-                  {ingredients.join(", ")}
-                </AppText>
-              ) : (
-                <AppText style={{ color: colors.primary }}>Ingredients</AppText>
-              )}
             </>
+          )}
+          {ingredients.length !== 0 ? (
+            <AppText
+              style={{
+                color: colors.primary,
+                paddingTop: scale(2),
+              }}>
+              {ingredients.join(", ")}
+            </AppText>
+          ) : (
+            <AppText style={{ color: colors.primary }}>Ingredients</AppText>
           )}
         </View>
         <View style={{ padding: scale(5) }}>
@@ -265,36 +252,16 @@ const ConfigurePizzaScreen = ({ route }) => {
             </>
           )}
           {/* quantity option */}
-          {sizeIndex !== null && crustIndex !== null && (
-            <View style={styles.quantityContainer}>
-              <AppText style={styles.selectionHeading}>Quantity:</AppText>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  disabled={quantity === 1}
-                  onPress={() => setQuantity((prev) => prev - 1)}
-                  style={[
-                    styles.circleButton,
-                    { backgroundColor: colors.card },
-                    shadowStyle,
-                  ]}>
-                  <AntDesign name="minus" size={24} color={colors.text} />
-                </TouchableOpacity>
-                <AppText
-                  style={[styles.quantityText, { borderColor: colors.text }]}>
-                  {quantity}
-                </AppText>
-                <TouchableOpacity
-                  onPress={() => setQuantity((prev) => prev + 1)}
-                  style={[
-                    styles.circleButton,
-                    { backgroundColor: colors.card },
-                    shadowStyle,
-                  ]}>
-                  <AntDesign name="plus" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+          <View style={styles.quantityContainer}>
+            <AppText style={styles.selectionHeading}>Quantity:</AppText>
+            <QuantityCounter
+              disabled={quantity === 1}
+              onDecrease={() => setQuantity((prev) => prev - 1)}
+              onIncrease={() => setQuantity((prev) => prev + 1)}
+              quantity={quantity}
+              iconSize={24}
+            />
+          </View>
         </View>
       </ScrollView>
       {/* bottom page container */}
@@ -305,12 +272,12 @@ const ConfigurePizzaScreen = ({ route }) => {
             <AntDesign name="hearto" size={22} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={item ? addPrefiguredPizza : addCustomPizza}
+            onPress={addPizza}
             style={[
               styles.circleButton,
               { backgroundColor: colors.card, position: "relative" },
             ]}>
-            {pizzaItems.length !== 0 && (
+            {totalCount !== 0 && (
               <View
                 style={[
                   {
@@ -327,7 +294,7 @@ const ConfigurePizzaScreen = ({ route }) => {
                   shadowStyle,
                 ]}>
                 <Text style={{ color: "white", fontWeight: "bold" }}>
-                  {pizzaItems.length}
+                  {totalCount}
                 </Text>
               </View>
             )}
@@ -335,6 +302,7 @@ const ConfigurePizzaScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
+          onPress={checkoutSinglePizza}
           style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
           <Text
             style={{
@@ -392,12 +360,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: scale(10),
-  },
-  quantityText: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: scale(10),
-    paddingHorizontal: scale(18),
-    marginHorizontal: scale(8),
   },
 });

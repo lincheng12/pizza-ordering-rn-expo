@@ -9,6 +9,7 @@ import { DarkTheme, LightTheme } from "../assets/Colors";
 import { headerTitleStyle } from "../assets/Styles";
 import PizzaSelectionDetailsScreen from "../screens/PizzaSelectionDetailsScreen";
 import ConfigurePizzaScreen from "../screens/ConfigurePizzaScreen";
+import CheckoutScreen from "../screens/CheckoutScreen";
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,9 @@ const AppStack = () => {
           component={AppTabNavigator}
           options={{ headerShown: false }}
         />
+        <Stack.Group screenOptions={{ presentation: "modal" }}>
+          <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        </Stack.Group>
         <Stack.Screen
           name="PizzaSelectionDetails"
           component={PizzaSelectionDetailsScreen}

@@ -9,6 +9,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useTheme } from "@react-navigation/native";
 import { headerTitleStyle } from "../assets/Styles";
+import { useSelector } from "react-redux";
+import { selectTotalCount } from "../redux/slices/basketSlice";
 
 const BottomTabs = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -88,6 +90,7 @@ const ProfileStack = ({ navigation }) => {
 
 const AppTabNavigator = () => {
   const { colors } = useTheme();
+  const totalCount = useSelector(selectTotalCount);
   return (
     <BottomTabs.Navigator
       initialRouteName="Home"
@@ -128,7 +131,13 @@ const AppTabNavigator = () => {
       })}>
       <BottomTabs.Screen name="Home" component={HomeStack} />
       <BottomTabs.Screen name="Orders" component={OrdersStack} />
-      <BottomTabs.Screen name="Basket" component={BasketStack} />
+      <BottomTabs.Screen
+        name="Basket"
+        component={BasketStack}
+        options={{
+          tabBarBadge: totalCount !== 0 ? totalCount : false,
+        }}
+      />
       <BottomTabs.Screen name="Profile" component={ProfileStack} />
     </BottomTabs.Navigator>
   );
