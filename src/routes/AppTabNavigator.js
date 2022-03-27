@@ -95,6 +95,7 @@ const AppTabNavigator = () => {
     <BottomTabs.Navigator
       initialRouteName="Home"
       barStyle={{ backgroundColor: colors.primary }}
+      activeColor="white"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => {
           let iconName;
@@ -102,21 +103,21 @@ const AppTabNavigator = () => {
           switch (route.name) {
             case "Home":
               iconName = focused ? "pizza" : "pizza-outline";
-              icon = <Ionicons name={iconName} size={22} color={colors.text} />;
+              icon = <Ionicons name={iconName} size={22} color="white" />;
               break;
             case "Orders":
               iconName = focused
                 ? "ios-document-text"
                 : "ios-document-text-outline";
-              icon = <Ionicons name={iconName} size={22} color={colors.text} />;
+              icon = <Ionicons name={iconName} size={22} color="white" />;
               break;
             case "Basket":
               iconName = focused ? "basket" : "basket-outline";
-              icon = <Ionicons name={iconName} size={22} color={colors.text} />;
+              icon = <Ionicons name={iconName} size={22} color="white" />;
               break;
             case "Profile":
               iconName = focused ? "person" : "person-outline";
-              icon = <Ionicons name={iconName} size={22} color={colors.text} />;
+              icon = <Ionicons name={iconName} size={22} color="white" />;
           }
           return (
             <View
