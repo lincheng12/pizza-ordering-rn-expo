@@ -10,6 +10,8 @@ import { headerTitleStyle } from "../assets/Styles";
 import PizzaSelectionDetailsScreen from "../screens/PizzaSelectionDetailsScreen";
 import ConfigurePizzaScreen from "../screens/ConfigurePizzaScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
+import LoginScreen from "../screens/Auth/LoginScreen";
+import RegisterScreen from "../screens/Auth/RegisterScreen";
 
 const Stack = createStackNavigator();
 
@@ -32,6 +34,12 @@ const AppStack = () => {
         />
         <Stack.Group screenOptions={{ presentation: "modal" }}>
           <Stack.Screen name="Checkout" component={CheckoutScreen} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Register" component={RegisterScreen} />
         </Stack.Group>
         <Stack.Screen
           name="PizzaSelectionDetails"

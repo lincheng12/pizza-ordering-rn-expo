@@ -22,6 +22,7 @@ import { creditCardType, formatPrice } from "../lib/helper";
 import { Fontisto } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AppButton from "../components/AppButton";
 
 const CheckoutScreen = ({ route }) => {
   const { item, type } = route.params;
@@ -142,19 +143,15 @@ const CheckoutScreen = ({ route }) => {
           </View>
         </View>
         <View style={styles.sectionContainer}>
-          <TouchableOpacity
-            style={[
-              { backgroundColor: colors.primary },
-              styles.checkoutBtn,
-              shadowStyle,
-            ]}>
-            <Text style={[{ fontSize: moderateScale(16) }, styles.btnText]}>
-              Pay{" "}
-              {type === "single"
+          <AppButton
+            buttonContainerStyle={styles.checkoutBtn}
+            bgColor={colors.primary}
+            btnText={`Pay ${
+              type === "single"
                 ? formatPrice(item.price * item.quantity)
-                : formatPrice(pizzaTotal)}
-            </Text>
-          </TouchableOpacity>
+                : formatPrice(pizzaTotal)
+            }`}
+          />
         </View>
       </KeyboardAwareScrollView>
     </AppView>
@@ -177,10 +174,5 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(12),
     flexGrow: 0.7,
     borderRadius: 10,
-  },
-  btnText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
   },
 });

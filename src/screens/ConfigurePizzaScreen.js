@@ -24,6 +24,7 @@ import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import { addToBasket, selectTotalCount } from "../redux/slices/basketSlice";
 import QuantityCounter from "../components/QuantityCounter";
+import AppButton from "../components/AppButton";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
@@ -301,18 +302,12 @@ const ConfigurePizzaScreen = ({ route }) => {
             <Ionicons name="basket" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
+        <AppButton
           onPress={checkoutSinglePizza}
-          style={[styles.checkoutButton, { backgroundColor: colors.primary }]}>
-          <Text
-            style={{
-              color: "white",
-              fontSize: moderateScale(16),
-              fontWeight: "bold",
-            }}>
-            {formatPrice(price)} (x{quantity}) Checkout
-          </Text>
-        </TouchableOpacity>
+          buttonContainerStyle={styles.checkoutButton}
+          bgColor={colors.primary}
+          btnText={`${formatPrice(price)} (x${quantity}) Checkout`}
+        />
       </View>
     </AppView>
   );

@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { StyleSheet, View, ScrollView, Image } from "react-native";
 import React, { useLayoutEffect } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
@@ -21,8 +14,9 @@ import {
 } from "../redux/slices/basketSlice";
 import { formatPrice } from "../lib/helper";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { moderateScale, scale, shadowStyle } from "../assets/Styles";
+import { moderateScale, scale } from "../assets/Styles";
 import BasketCard from "../components/BasketCard";
+import AppButton from "../components/AppButton";
 
 const BasketScreen = () => {
   const { colors } = useTheme();
@@ -80,28 +74,19 @@ const BasketScreen = () => {
           </ScrollView>
           <View
             style={[{ backgroundColor: colors.card }, styles.footerContainer]}>
-            <TouchableOpacity
+            <AppButton
               onPress={() => dispatch(clearBasket())}
-              style={[
-                { backgroundColor: colors.notification },
-                styles.clearBtn,
-                shadowStyle,
-              ]}>
-              <Text style={[{ fontSize: moderateScale(15.5) }, styles.btnText]}>
-                Clear
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+              buttonContainerStyle={styles.clearBtn}
+              bgColor={colors.notification}
+              btnTextStyle={{ fontSize: moderateScale(15.5) }}
+              btnText="Clear"
+            />
+            <AppButton
               onPress={() => nav.navigate("Checkout", { type: "multiple" })}
-              style={[
-                { backgroundColor: colors.primary },
-                styles.checkoutBtn,
-                shadowStyle,
-              ]}>
-              <Text style={[{ fontSize: moderateScale(16) }, styles.btnText]}>
-                Checkout ({totalCount} items)
-              </Text>
-            </TouchableOpacity>
+              buttonContainerStyle={styles.checkoutBtn}
+              bgColor={colors.primary}
+              btnText={`Checkout (${totalCount} items)`}
+            />
           </View>
         </>
       )}

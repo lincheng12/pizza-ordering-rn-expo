@@ -70,6 +70,11 @@ export const mapToppings = (arr) =>
 export const mapSauces = (arr) =>
   arr.sort((a, b) => a - b).map((index) => capitalize(menu.sauces[index].type));
 
+/**
+ * takes a string of number and determined the credit card type
+ * @param {string} cc
+ * @returns credit card icon name
+ */
 export const creditCardType = (cc) => {
   let amex = new RegExp("^3[47][0-9]{13}$");
   let visa = new RegExp("^4[0-9]{12}(?:[0-9]{3})?$");
@@ -81,18 +86,9 @@ export const creditCardType = (cc) => {
   let disco2 = new RegExp("^62[24568][0-9]{13}[0-9]*$");
   let disco3 = new RegExp("^6[45][0-9]{14}[0-9]*$");
 
-  if (visa.test(cc)) {
-    return "visa";
-  }
-  if (amex.test(cc)) {
-    return "american-express";
-  }
-  if (mastercard.test(cc) || mastercard2.test(cc)) {
-    return "mastercard";
-  }
-  if (disco1.test(cc) || disco2.test(cc) || disco3.test(cc)) {
-    return "discover";
-  }
-
-  return undefined;
+  if (visa.test(cc)) return "visa";
+  if (amex.test(cc)) return "american-express";
+  if (mastercard.test(cc) || mastercard2.test(cc)) return "mastercard";
+  if (disco1.test(cc) || disco2.test(cc) || disco3.test(cc)) return "discover";
+  return null;
 };
