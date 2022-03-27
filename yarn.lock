@@ -4741,6 +4741,11 @@ react-native-codegen@^0.0.6:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
+react-native-floating-label-input@^1.3.13:
+  version "1.3.13"
+  resolved "https://registry.yarnpkg.com/react-native-floating-label-input/-/react-native-floating-label-input-1.3.13.tgz#185bded60c544fdd36c345595bdd7aae2a847577"
+  integrity sha512-vTfwiT4e6/9BdzFuvVo9Bg1Lj0Kle22GivoWzmSII1ZwvH56sjZvKKWpBfomNXy9VIneK3lky+l2Xb40+hsQMw==
+
 react-native-gesture-handler@~2.1.0:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.1.3.tgz#b96f1e61932d5062cb1023259e1649d65f78338b"

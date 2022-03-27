@@ -19,14 +19,20 @@ import {
   sHeight,
   verticalScale,
 } from "../../assets/Styles";
-import TextInputWithIcon from "../../components/TextInputWithIcon";
 import AppLoading from "expo-app-loading";
 import { useFonts, Lobster_400Regular } from "@expo-google-fonts/lobster";
+import { FloatingLabelInput } from "react-native-floating-label-input";
+import { Ionicons } from "@expo/vector-icons";
+import AppText from "../../components/AppText";
+import useThemePreference from "../../hooks/useThemePreference";
 
 const LoginScreen = () => {
   const nav = useNavigation();
+  const { themePreference } = useThemePreference();
   const { colors } = useTheme();
   const insects = useSafeAreaInsets();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   let [fontsLoaded] = useFonts({
     Lobster_400Regular,
   });
@@ -50,21 +56,29 @@ const LoginScreen = () => {
             justifyContent: "center",
             position: "relative",
           }}
-          source={require("../../assets/background.jpg")}>
+          source={
+            themePreference === "dark"
+              ? require("../../assets/pizza_light.jpg")
+              : require("../../assets/background.jpg")
+          }>
           <View style={{ position: "absolute", top: scale(65) }}>
-            <Text
-              style={{
-                color: "white",
-                fontSize: scale(40),
-                fontFamily: "Lobster_400Regular",
-              }}>
+            <AppText
+              style={[
+                {
+                  color: colors.card,
+                  fontSize: scale(40),
+                  fontFamily: "Lobster_400Regular",
+                },
+                shadowStyle,
+              ]}>
               Mar's Pizzeria
-            </Text>
+            </AppText>
           </View>
           <View
             style={[
               {
-                backgroundColor: "whitesmoke",
+                backgroundColor: colors.card,
+                opacity: 0.9,
                 width: "80%",
                 height: verticalScale(300),
                 borderRadius: 10,
@@ -77,32 +91,74 @@ const LoginScreen = () => {
               shadowStyle,
             ]}>
             <View style={{ position: "absolute", top: scale(35) }}>
-              <Text style={{ fontSize: scale(18), fontWeight: "bold" }}>
+              <AppText style={{ fontSize: scale(18), fontWeight: "bold" }}>
                 Your account information:
-              </Text>
+              </AppText>
             </View>
-            <View style={{ marginBottom: scale(15), marginTop: scale(-20) }}>
-              <TextInputWithIcon
-                iconName="ios-person-outline"
-                focused={colors.primary}
-                blur="gray"
-                blurIcon="gray"
-                placeholderColor="gray"
-                placeholderText="Email"
+            <View
+              style={{
+                marginBottom: scale(15),
+                marginTop: scale(-20),
+                width: "100%",
+              }}>
+              <FloatingLabelInput
+                label="Email"
                 keyboardType="email-address"
+                value={email}
+                animationDuration={120}
+                leftComponent={
+                  <Ionicons name="ios-person-outline" size={24} color="gray" />
+                }
+                containerStyles={styles.outerInputContainer}
+                customLabelStyles={{
+                  colorFocused: colors.primary,
+                  fontSizeFocused: scale(12),
+                  colorBlurred: "gray",
+                  fontSizeBlurred: scale(14),
+                }}
+                labelStyles={styles.labelContainerStyle}
+                inputStyles={{
+                  color: colors.text,
+                  paddingHorizontal: scale(10),
+                  paddingVertical: scale(8),
+                }}
+                onChangeText={setEmail}
               />
-            </View>
-            <View style={{ marginBottom: scale(10) }}>
-              <TextInputWithIcon
-                iconName="key-outline"
-                focused={colors.primary}
-                blur="gray"
-                blurIcon="gray"
-                placeholderColor="gray"
-                placeholderText="Password"
-                thirdIcon
-                thirdIconColor="black"
-                secureTextEntry
+              <FloatingLabelInput
+                label="Password"
+                value={password}
+                animationDuration={120}
+                maxLength={8}
+                showCountdown
+                showCountdownStyles={{
+                  color: colors.text,
+                  position: "absolute",
+                  bottom: scale(-14),
+                }}
+                leftComponent={
+                  <Ionicons name="key-outline" size={24} color="gray" />
+                }
+                customShowPasswordComponent={
+                  <Ionicons name="eye-outline" size={24} color="gray" />
+                }
+                customHidePasswordComponent={
+                  <Ionicons name="eye-off-outline" size={24} color="gray" />
+                }
+                isPassword={true}
+                containerStyles={styles.outerInputContainer}
+                customLabelStyles={{
+                  colorFocused: colors.primary,
+                  fontSizeFocused: scale(12),
+                  colorBlurred: "gray",
+                  fontSizeBlurred: scale(14),
+                }}
+                labelStyles={styles.labelContainerStyle}
+                inputStyles={{
+                  color: colors.text,
+                  paddingHorizontal: scale(10),
+                  paddingVertical: scale(8),
+                }}
+                onChangeText={setPassword}
               />
             </View>
             <AppButton
@@ -110,6 +166,7 @@ const LoginScreen = () => {
                 position: "absolute",
                 bottom: scale(35),
                 width: moderateScale(200),
+                opacity: 1,
               }}
               bgColor={colors.primary}
               btnText="Login"
@@ -137,20 +194,18 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  textInputContainer: {
-    flexDirection: "row",
-    width: "100%",
-    height: 40,
+  outerInputContainer: {
     borderBottomWidth: 2,
     paddingHorizontal: scale(3),
-    alignItems: "center",
+    borderColor: "gray",
+    marginVertical: Platform.OS === "android" ? scale(6) : scale(12),
   },
-  textInput: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    fontSize: moderateScale(16),
-    justifyContent: "center",
-    paddingLeft: scale(5),
+  labelContainerStyle: {
+    paddingHorizontal: scale(5),
+  },
+  inputStyle: {
+    color: "black",
+    paddingHorizontal: scale(10),
+    paddingVertical: scale(8),
   },
 });

@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import React, { useState } from "react";
 import AppText from "../components/AppText";
 import AppView from "../components/AppView";
@@ -16,13 +10,13 @@ import {
   selectTotalCount,
 } from "../redux/slices/basketSlice";
 import BasketCard from "../components/BasketCard";
-import { moderateScale, scale, shadowStyle, sWidth } from "../assets/Styles";
-import AppTextInput from "../components/AppTextInput";
+import { moderateScale, scale } from "../assets/Styles";
 import { creditCardType, formatPrice } from "../lib/helper";
 import { Fontisto } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppButton from "../components/AppButton";
+import AppFloatingInput from "../components/AppFloatingInput";
 
 const CheckoutScreen = ({ route }) => {
   const { item, type } = route.params;
@@ -31,7 +25,16 @@ const CheckoutScreen = ({ route }) => {
   const pizzaItems = useSelector(selectItems);
   const pizzaTotal = useSelector(selectTotal);
   const totalCount = useSelector(selectTotalCount);
-  const [cardNumber, setCardNumber] = useState("");
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipcode, setZipcode] = useState("");
+  const [card, setCard] = useState("");
+  const [cvv, setCVV] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleCardNumber = (text) => {
     let formattedText = text.split(" ").join("");
@@ -47,7 +50,7 @@ const CheckoutScreen = ({ route }) => {
       <KeyboardAwareScrollView
         enableOnAndroid={false}
         extraHeight={scale(20)}
-        contentContainerStyle={{ padding: 5 }}
+        contentContainerStyle={{ padding: scale(5) }}
         style={{ flex: 1 }}>
         <AppText style={styles.text}>
           {type === "single"
@@ -84,63 +87,118 @@ const CheckoutScreen = ({ route }) => {
         )}
         <View style={styles.sectionContainer}>
           <AppText style={styles.text}>Enter your name:</AppText>
-          <AppTextInput placeholder="First name" />
-          <AppTextInput placeholder="Last name" />
+          <AppFloatingInput
+            style={{ marginTop: scale(8) }}
+            label="First Name"
+            value={fname}
+            onChangeText={setFname}
+          />
+          <AppFloatingInput
+            style={{ marginTop: scale(8) }}
+            label="Last Name"
+            value={lname}
+            onChangeText={setLname}
+          />
+          <AppFloatingInput
+            style={{ marginTop: scale(8) }}
+            label="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
         </View>
         <View style={styles.sectionContainer}>
           <AppText style={styles.text}>Enter your address:</AppText>
-          <AppTextInput placeholder="Address" />
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <AppTextInput
-              containerStyle={{ width: sWidth / 2 }}
-              placeholder="Enter your city"
-            />
-            <AppTextInput
-              maxLength={2}
-              containerStyle={{ width: sWidth / 4.6 }}
-              placeholder="State"
-            />
-            <AppTextInput
-              maxLength={5}
-              keyboardType="number-pad"
-              containerStyle={{ width: sWidth / 4 }}
-              placeholder="Zipcode"
-            />
-          </View>
-        </View>
-        <View style={styles.sectionContainer}>
-          <AppText style={styles.text}>Enter your credit card:</AppText>
+          <AppFloatingInput
+            style={{ marginTop: scale(8) }}
+            label="Address"
+            value={address}
+            onChangeText={setAddress}
+          />
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              alignItems: "center",
+              marginTop: scale(8),
             }}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <AppTextInput
-                containerStyle={{ width: sWidth / 1.9 }}
-                maxLength={19}
-                value={cardNumber}
-                onChangeText={(text) => handleCardNumber(text)}
+            <AppFloatingInput
+              totalWidth="45%"
+              label="City"
+              value={city}
+              onChangeText={setCity}
+            />
+            <AppFloatingInput
+              totalWidth="20%"
+              label="State"
+              hint="AB"
+              mask="AB"
+              autoCapitalize="characters"
+              value={state}
+              onChangeText={setState}
+            />
+            <AppFloatingInput
+              totalWidth="30%"
+              label="Zipcode"
+              hint="12345"
+              mask="12345"
+              keyboardType="number-pad"
+              value={zipcode}
+              onChangeText={setZipcode}
+            />
+          </View>
+        </View>
+        <View style={styles.sectionContainer}>
+          <AppText style={styles.text}>Enter the remaining:</AppText>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: scale(8),
+            }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                width: "68%",
+              }}>
+              <AppFloatingInput
+                totalWidth="80%"
+                label="Credit Card"
+                maskType="card"
+                hint="1234 1234 1234 1234"
+                mask="1234 1234 1234 1234"
                 keyboardType="number-pad"
-                placeholder="Enter your credit card"
+                maxLength={19}
+                value={card}
+                onChangeText={setCard}
               />
               <Fontisto
                 style={{ marginLeft: scale(5) }}
-                name={creditCardType(cardNumber.split(" ").join(""))}
+                name={creditCardType(card.split(" ").join(""))}
                 size={25}
                 color={colors.primary}
               />
             </View>
-
-            <AppTextInput
-              containerStyle={{ width: sWidth / 3.5 }}
-              maxLength={3}
+            <AppFloatingInput
+              totalWidth="30%"
+              label="Card CVV"
+              hint="123"
+              mask="123"
               keyboardType="number-pad"
-              placeholder="Card CVV"
+              value={cvv}
+              onChangeText={setCVV}
             />
           </View>
+          <AppFloatingInput
+            style={{ marginTop: scale(8) }}
+            label="Phone"
+            maskType="phone"
+            mask="(123) 123-1234"
+            hint="(123) 123-1234"
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
+          />
         </View>
         <View style={styles.sectionContainer}>
           <AppButton
@@ -165,7 +223,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: moderateScale(17),
     marginLeft: scale(5),
-    marginBottom: scale(5),
+    marginBottom: scale(3),
   },
   sectionContainer: {
     marginTop: 10,
