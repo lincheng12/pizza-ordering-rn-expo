@@ -10,14 +10,15 @@ import { RadioButton } from "react-native-paper";
 import AppButton from "../components/AppButton";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectUser } from "../redux/slices/userSlice";
 
 const SettingsScreen = () => {
   const { themeName, updateGlobalThemePreference } = useThemePreference();
   const [localThemeValue, setLocalThemeValue] = useState(themeName);
   const { colors } = useTheme();
   const dispatch = useDispatch();
+  const userProfile = useSelector(selectUser);
   const nav = useNavigation();
 
   const storeThemeValue = async (value) => {
@@ -99,18 +100,20 @@ const SettingsScreen = () => {
           appearance based on your device's system settings.
         </AppText>
       </View>
-      <AppButton
-        buttonContainerStyle={{
-          // position: "absolute",
-          // bottom: scale(35),
-          paddingVertical: moderateScale(12),
-          marginTop: scale(18),
-          width: "100%",
-        }}
-        bgColor={colors.primary}
-        btnText="Logout"
-        onPress={userLogout}
-      />
+      {userProfile !== null && (
+        <AppButton
+          buttonContainerStyle={{
+            // position: "absolute",
+            // bottom: scale(35),
+            paddingVertical: moderateScale(12),
+            marginTop: scale(18),
+            width: "100%",
+          }}
+          bgColor={colors.primary}
+          btnText="Logout"
+          onPress={userLogout}
+        />
+      )}
     </AppView>
   );
 };
