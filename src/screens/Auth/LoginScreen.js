@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
   Keyboard,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation, useTheme } from "@react-navigation/native";
@@ -25,9 +26,14 @@ import { FloatingLabelInput } from "react-native-floating-label-input";
 import { Ionicons } from "@expo/vector-icons";
 import AppText from "../../components/AppText";
 import useThemePreference from "../../hooks/useThemePreference";
+import { auth } from "../../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { getUserById } from "../../redux/slices/userSlice";
 
 const LoginScreen = () => {
   const nav = useNavigation();
+  const dispatch = useDispatch();
   const { themePreference } = useThemePreference();
   const { colors } = useTheme();
   const insects = useSafeAreaInsets();
@@ -40,6 +46,20 @@ const LoginScreen = () => {
   if (!fontsLoaded) {
     return <AppLoading />;
   }
+
+  const signIn = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      dispatch(getUserById(userCredential.user.uid));
+      nav.goBack();
+    } catch (err) {
+      Alert.alert(err.message);
+    }
+  };
 
   return (
     <Pressable style={{ height: sHeight }} onPress={() => Keyboard.dismiss()}>
@@ -166,11 +186,10 @@ const LoginScreen = () => {
                 position: "absolute",
                 bottom: scale(35),
                 width: moderateScale(200),
-                opacity: 1,
               }}
               bgColor={colors.primary}
               btnText="Login"
-              // onPress={() => nav.navigate("Register")}
+              onPress={signIn}
             />
           </View>
           <TouchableOpacity

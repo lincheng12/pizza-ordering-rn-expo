@@ -3,15 +3,25 @@ import React from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { useSelector } from "react-redux";
-import { selectUser } from "../redux/slices/userSlice";
+import { selectLoading, selectUser } from "../redux/slices/userSlice";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import AppButton from "../components/AppButton";
+import { ActivityIndicator } from "react-native-paper";
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
+  const loading = useSelector(selectLoading);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <AppView style={{ flex: 1 }}>
@@ -29,7 +39,9 @@ const ProfileScreen = () => {
           />
         </View>
       ) : (
-        <AppText>Welcome</AppText>
+        <AppText>
+          Welcome {userProfile.fname} {userProfile.lname}
+        </AppText>
       )}
     </AppView>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
@@ -12,11 +12,30 @@ import ConfigurePizzaScreen from "../screens/ConfigurePizzaScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import LoginScreen from "../screens/Auth/LoginScreen";
 import RegisterScreen from "../screens/Auth/RegisterScreen";
+import { onAuthStateChanged } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserById, selectLoading } from "../redux/slices/userSlice";
+import { auth } from "../../firebase";
+import AppLoading from "expo-app-loading";
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
   const { themePreference } = useThemePreference();
+  const dispatch = useDispatch();
+  const loadingState = useSelector(selectLoading);
+
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          dispatch(getUserById(user.uid));
+        }
+      }),
+    []
+  );
+
+  if (loadingState) <AppLoading />;
 
   return (
     <NavigationContainer

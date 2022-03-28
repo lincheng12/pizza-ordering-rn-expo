@@ -1,6 +1,10 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, View, Image, Alert } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import {
+  StackActions,
+  useNavigation,
+  useTheme,
+} from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppView from "../../components/AppView";
 import { moderateScale, scale } from "../../assets/Styles";
@@ -9,6 +13,9 @@ import { Ionicons, Fontisto } from "@expo/vector-icons";
 import AppText from "../../components/AppText";
 import AppButton from "../../components/AppButton";
 import { creditCardType } from "../../lib/helper";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const RegisterScreen = () => {
   const { colors } = useTheme();
@@ -39,6 +46,46 @@ const RegisterScreen = () => {
       headerTitle: "Create your account",
     });
   }, []);
+
+  const createAccount = async () => {
+    try {
+      if (fname !== "" && lname !== "" && email !== "" && password !== "") {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        const userProfileObj = {
+          id: user.uid,
+          fname,
+          lname,
+          email,
+          address,
+          city,
+          state,
+          zipcode,
+          card,
+          cvv,
+          phone,
+          createdAt: serverTimestamp(),
+          rewards: 2,
+        };
+
+        await setDoc(doc(db, "users", user.uid), userProfileObj);
+        nav.dispatch(StackActions.popToTop());
+        Alert.alert(
+          "Thank you for creating your account! You earned 2 reward points."
+        );
+      } else {
+        Alert.alert("The required information is incomplete.");
+      }
+    } catch (err) {
+      console.log(err.message);
+      Alert.alert(err);
+    }
+  };
 
   return (
     <AppView style={{ flex: 1 }}>
@@ -147,6 +194,14 @@ const RegisterScreen = () => {
               onChangeText={setZipcode}
             />
           </View>
+          <AppText
+            style={{
+              fontSize: 11,
+              marginLeft: scale(5),
+              marginTop: scale(8),
+            }}>
+            Accepting American Express, MasterCard, Visa, and Discover
+          </AppText>
           <View
             style={{
               flexDirection: "row",
@@ -200,15 +255,13 @@ const RegisterScreen = () => {
         </View>
         <AppButton
           buttonContainerStyle={{
-            // position: "absolute",
-            // bottom: scale(35),
             paddingVertical: moderateScale(12),
             marginTop: scale(18),
             width: "100%",
           }}
           bgColor={colors.primary}
           btnText="Register"
-          // onPress={() => nav.navigate("Register")}
+          onPress={createAccount}
         />
       </KeyboardAwareScrollView>
     </AppView>

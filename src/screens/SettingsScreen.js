@@ -2,16 +2,23 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useThemePreference from "../hooks/useThemePreference";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { moderateScale, scale, sWidth } from "../assets/Styles";
 import { RadioButton } from "react-native-paper";
+import AppButton from "../components/AppButton";
+import { auth } from "../../firebase";
+import { signOut } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slices/userSlice";
 
 const SettingsScreen = () => {
   const { themeName, updateGlobalThemePreference } = useThemePreference();
   const [localThemeValue, setLocalThemeValue] = useState(themeName);
   const { colors } = useTheme();
+  const dispatch = useDispatch();
+  const nav = useNavigation();
 
   const storeThemeValue = async (value) => {
     try {
@@ -21,6 +28,15 @@ const SettingsScreen = () => {
     } catch (err) {
       console.log("async storage saving: ", err);
     }
+  };
+
+  const userLogout = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(logout());
+        nav.goBack();
+      })
+      .catch((err) => console.log("Error signing user out ", err));
   };
 
   return (
@@ -83,6 +99,18 @@ const SettingsScreen = () => {
           appearance based on your device's system settings.
         </AppText>
       </View>
+      <AppButton
+        buttonContainerStyle={{
+          // position: "absolute",
+          // bottom: scale(35),
+          paddingVertical: moderateScale(12),
+          marginTop: scale(18),
+          width: "100%",
+        }}
+        bgColor={colors.primary}
+        btnText="Logout"
+        onPress={userLogout}
+      />
     </AppView>
   );
 };
