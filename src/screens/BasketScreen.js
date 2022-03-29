@@ -14,7 +14,7 @@ import {
 } from "../redux/slices/basketSlice";
 import { formatPrice } from "../lib/helper";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { moderateScale, scale } from "../assets/Styles";
+import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import BasketCard from "../components/BasketCard";
 import AppButton from "../components/AppButton";
 
@@ -73,7 +73,11 @@ const BasketScreen = () => {
             ))}
           </ScrollView>
           <View
-            style={[{ backgroundColor: colors.card }, styles.footerContainer]}>
+            style={[
+              { backgroundColor: colors.card },
+              styles.footerContainer,
+              shadowStyle,
+            ]}>
             <AppButton
               onPress={() => dispatch(clearBasket())}
               buttonContainerStyle={styles.clearBtn}

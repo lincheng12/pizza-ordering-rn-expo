@@ -14,7 +14,11 @@ import LoginScreen from "../screens/Auth/LoginScreen";
 import RegisterScreen from "../screens/Auth/RegisterScreen";
 import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserById, selectLoading } from "../redux/slices/userSlice";
+import {
+  getUserById,
+  selectLoading,
+  selectUser,
+} from "../redux/slices/userSlice";
 import { auth } from "../../firebase";
 import AppLoading from "expo-app-loading";
 import EditInformationScreen from "../screens/EditInformationScreen";
@@ -25,11 +29,12 @@ const AppStack = () => {
   const { themePreference } = useThemePreference();
   const dispatch = useDispatch();
   const loadingState = useSelector(selectLoading);
+  const localUserState = useSelector(selectUser);
 
   useEffect(
     () =>
       onAuthStateChanged(auth, (user) => {
-        if (user) {
+        if (user && localUserState === null) {
           dispatch(getUserById(user.uid));
         }
       }),
