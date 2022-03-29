@@ -2,24 +2,16 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useThemePreference from "../hooks/useThemePreference";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { moderateScale, scale, sWidth } from "../assets/Styles";
 import { RadioButton } from "react-native-paper";
-import AppButton from "../components/AppButton";
-import { auth } from "../../firebase";
-import { signOut } from "firebase/auth";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, selectUser } from "../redux/slices/userSlice";
 
 const SettingsScreen = () => {
   const { themeName, updateGlobalThemePreference } = useThemePreference();
   const [localThemeValue, setLocalThemeValue] = useState(themeName);
   const { colors } = useTheme();
-  const dispatch = useDispatch();
-  const userProfile = useSelector(selectUser);
-  const nav = useNavigation();
 
   const storeThemeValue = async (value) => {
     try {
@@ -31,18 +23,9 @@ const SettingsScreen = () => {
     }
   };
 
-  const userLogout = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch(logout());
-        nav.goBack();
-      })
-      .catch((err) => console.log("Error signing user out ", err));
-  };
-
   return (
-    <AppView style={{ flex: 1 }}>
-      <View>
+    <AppView style={{ flex: 1, position: "relative", alignItems: "center" }}>
+      <View style={{ width: "100%" }}>
         <AppText style={styles.changeThemeHeader}>
           Change your color theme:
         </AppText>
@@ -100,20 +83,6 @@ const SettingsScreen = () => {
           appearance based on your device's system settings.
         </AppText>
       </View>
-      {userProfile !== null && (
-        <AppButton
-          buttonContainerStyle={{
-            // position: "absolute",
-            // bottom: scale(35),
-            paddingVertical: moderateScale(12),
-            marginTop: scale(18),
-            width: "100%",
-          }}
-          bgColor={colors.primary}
-          btnText="Logout"
-          onPress={userLogout}
-        />
-      )}
     </AppView>
   );
 };

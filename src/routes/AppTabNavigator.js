@@ -75,10 +75,26 @@ const ProfileStack = ({ navigation }) => {
         headerTitle: "Profile",
         headerTitleAlign: "left",
         headerTitleStyle: headerTitleStyle,
+        headerStyle: {
+          backgroundColor: colors.primary,
+          borderWidth: 0,
+          shadowColor: "transparent",
+        },
+        headerTitleStyle: {
+          color: "white",
+          fontSize: 20,
+        },
+        headerTintColor: "white",
         headerRight: () => (
-          <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
+          <TouchableOpacity
+            style={{
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => navigation.navigate("Settings")}>
             <View style={{ marginRight: 15 }}>
-              <Ionicons name="settings" size={22} color={colors.text} />
+              <Ionicons name="settings" size={22} color="white" />
             </View>
           </TouchableOpacity>
         ),

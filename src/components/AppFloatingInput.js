@@ -51,6 +51,7 @@ const AppFloatingInput = (props) => {
           //   fontSize: scale(15),
           marginVertical: scale(-2),
           height: 50,
+          fontSize: scale(14.2),
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}

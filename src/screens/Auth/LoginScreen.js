@@ -125,7 +125,7 @@ const LoginScreen = () => {
                 label="Email"
                 keyboardType="email-address"
                 value={email}
-                animationDuration={120}
+                animationDuration={150}
                 leftComponent={
                   <Ionicons name="ios-person-outline" size={24} color="gray" />
                 }
@@ -141,13 +141,14 @@ const LoginScreen = () => {
                   color: colors.text,
                   paddingHorizontal: scale(10),
                   paddingVertical: scale(8),
+                  fontSize: scale(14.2),
                 }}
                 onChangeText={setEmail}
               />
               <FloatingLabelInput
                 label="Password"
                 value={password}
-                animationDuration={120}
+                animationDuration={150}
                 maxLength={8}
                 showCountdown
                 showCountdownStyles={{
@@ -177,6 +178,7 @@ const LoginScreen = () => {
                   color: colors.text,
                   paddingHorizontal: scale(10),
                   paddingVertical: scale(8),
+                  fontSize: scale(14.2),
                 }}
                 onChangeText={setPassword}
               />
