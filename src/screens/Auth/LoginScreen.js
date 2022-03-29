@@ -124,6 +124,7 @@ const LoginScreen = () => {
               <FloatingLabelInput
                 label="Email"
                 keyboardType="email-address"
+                autoCapitalize="none"
                 value={email}
                 animationDuration={150}
                 leftComponent={

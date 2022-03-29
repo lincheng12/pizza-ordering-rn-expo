@@ -114,18 +114,44 @@ const ProfileScreen = () => {
           </View>
           <View
             style={{
-              borderWidth: 1,
+              //borderWidth: 1,
               flex: 1,
               padding: scale(10),
               justifyContent: "space-between",
             }}>
             <View>
-              <TouchableCard name="Personal Information" />
-              <TouchableCard name="Saved Address" />
-              <TouchableCard name="Payment Method" />
-              <TouchableCard name="Rewards" />
-              <TouchableCard name="Customer Support" />
-              <TouchableCard name="Private Policy" />
+              <TouchableCard
+                onPress={() =>
+                  nav.navigate("EditInformation", { type: "profile" })
+                }
+                name="Personal Information"
+              />
+              <TouchableCard
+                onPress={() =>
+                  nav.navigate("EditInformation", { type: "address" })
+                }
+                name="Saved Address"
+              />
+              <TouchableCard
+                onPress={() =>
+                  nav.navigate("EditInformation", { type: "payment" })
+                }
+                name="Payment Method"
+              />
+              <TouchableCard
+                onPress={() =>
+                  nav.navigate("EditInformation", { type: "rewards" })
+                }
+                name="Rewards"
+              />
+              <TouchableCard
+                onPress={() => alert("Coming soon...")}
+                name="Customer Support"
+              />
+              <TouchableCard
+                onPress={() => alert("No information is collected")}
+                name="Private Policy"
+              />
             </View>
             <AppButton
               buttonContainerStyle={{

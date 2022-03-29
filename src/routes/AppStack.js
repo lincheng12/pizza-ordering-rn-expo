@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserById, selectLoading } from "../redux/slices/userSlice";
 import { auth } from "../../firebase";
 import AppLoading from "expo-app-loading";
+import EditInformationScreen from "../screens/EditInformationScreen";
 
 const Stack = createStackNavigator();
 
@@ -73,6 +74,10 @@ const AppStack = () => {
           name="ConfigurePizza"
           component={ConfigurePizzaScreen}
           options={{ headerTitle: "Pizza Configuration" }}
+        />
+        <Stack.Screen
+          name="EditInformation"
+          component={EditInformationScreen}
         />
         <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
