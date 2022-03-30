@@ -26,8 +26,8 @@ export const updateUserById = createAsyncThunk(
   async (payload, { getState, rejectWithValue }) => {
     try {
       const { id } = getState().user.profile;
-      await updateDoc(doc(db, "users", id), payload);
-      return payload;
+      await updateDoc(doc(db, "users", id), payload); //this updates the value stored on firebase
+      return payload; //this will be used to update the values stored in local profile state
     } catch (err) {
       return rejectWithValue(err);
     }

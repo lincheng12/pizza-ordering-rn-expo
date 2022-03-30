@@ -11,6 +11,7 @@ import { Fontisto } from "@expo/vector-icons";
 import { creditCardType } from "../lib/helper";
 import AppButton from "../components/AppButton";
 import moment from "moment";
+import { useForm, Controller } from "react-hook-form";
 
 const EditInformationScreen = ({ route }) => {
   const { type } = route.params;
@@ -18,15 +19,27 @@ const EditInformationScreen = ({ route }) => {
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
   const dispatch = useDispatch();
-  const [fname, setFname] = useState(userProfile.fname);
-  const [lname, setLname] = useState(userProfile.lname);
-  const [phone, setPhone] = useState(userProfile.phone);
+  // const [fname, setFname] = useState(userProfile.fname);
+  // const [lname, setLname] = useState(userProfile.lname);
+  // const [phone, setPhone] = useState(userProfile.phone);
   const [address, setAddress] = useState(userProfile.address);
   const [city, setCity] = useState(userProfile.city);
   const [state, setState] = useState(userProfile.state);
   const [zipcode, setZipcode] = useState(userProfile.zipcode);
   const [card, setCard] = useState(userProfile.card);
   const [cvv, setCVV] = useState(userProfile.cvv);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      fname: userProfile.fname,
+      lname: userProfile.lname,
+      phone: userProfile.phone,
+    },
+  });
 
   useLayoutEffect(() => {
     // Customizing the top header
@@ -48,26 +61,27 @@ const EditInformationScreen = ({ route }) => {
     }
   };
 
-  const updateProfile = () => {
-    if (
-      (fname !== userProfile.fname ||
-        lname !== userProfile.lname ||
-        phone !== userProfile.phone) &&
-      fname !== "" &&
-      lname !== "" &&
-      phone !== ""
-    ) {
-      const doc = {
-        fname: fname.trim(),
-        lname: lname.trim(),
-        phone,
-      };
-      dispatch(updateUserById(doc));
-      alert("User profile updated");
-    } else {
-      alert("Can't update empty or same information");
-    }
-  };
+  const onSubmit = (data) => console.log(data);
+  // const updateProfile = () => {
+  //   if (
+  //     (fname !== userProfile.fname ||
+  //       lname !== userProfile.lname ||
+  //       phone !== userProfile.phone) &&
+  //     fname !== "" &&
+  //     lname !== "" &&
+  //     phone !== ""
+  //   ) {
+  //     const doc = {
+  //       fname: fname.trim(),
+  //       lname: lname.trim(),
+  //       phone,
+  //     };
+  //     dispatch(updateUserById(doc));
+  //     alert("User profile updated");
+  //   } else {
+  //     alert("Can't update empty or same information");
+  //   }
+  // };
 
   // const updateAddress = async () => {
   //   if (
@@ -90,28 +104,65 @@ const EditInformationScreen = ({ route }) => {
         {/* edit profile */}
         {type === "profile" && (
           <>
-            <AppFloatingInput
-              style={{ marginTop: scale(8) }}
-              label="First Name"
-              value={fname}
-              onChangeText={setFname}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+                validate: {
+                  check: (v) => v !== userProfile.fname,
+                },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <AppFloatingInput
+                  style={{ marginTop: scale(8) }}
+                  label="First Name"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+              name="fname"
             />
-            <AppFloatingInput
-              style={{ marginTop: scale(8) }}
-              label="Last Name"
-              value={lname}
-              onChangeText={setLname}
+            {errors.fname && (
+              <Text style={{ color: "red" }}>
+                Value cannot be empty or contain the same value.
+              </Text>
+            )}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <AppFloatingInput
+                  style={{ marginTop: scale(8) }}
+                  label="Last Name"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+              name="lname"
             />
-            <AppFloatingInput
-              style={{ marginTop: scale(8) }}
-              label="Phone"
-              maskType="phone"
-              mask="(123) 123-1234"
-              hint="(123) 123-1234"
-              keyboardType="phone-pad"
-              value={phone}
-              onChangeText={setPhone}
+            {errors.lname && <Text>This is required.</Text>}
+            <Controller
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <AppFloatingInput
+                  style={{ marginTop: scale(8) }}
+                  label="Phone"
+                  maskType="phone"
+                  mask="(123) 123-1234"
+                  hint="(123) 123-1234"
+                  keyboardType="phone-pad"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+              name="phone"
             />
+            {errors.phone && <Text>This is required.</Text>}
             <View style={{ paddingLeft: scale(3), marginTop: scale(5) }}>
               <AppText>Note: The email you provided is permanent.</AppText>
               <Text
@@ -231,7 +282,7 @@ const EditInformationScreen = ({ route }) => {
           }}
           bgColor={colors.primary}
           btnText="Update"
-          onPress={updateProfile}
+          onPress={handleSubmit(onSubmit)}
         />
       </AppView>
     </Pressable>
