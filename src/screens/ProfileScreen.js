@@ -30,6 +30,8 @@ const ProfileScreen = () => {
     Lobster_400Regular,
   });
 
+  //console.log(userProfile);
+
   const userLogout = () => {
     signOut(auth)
       .then(() => {

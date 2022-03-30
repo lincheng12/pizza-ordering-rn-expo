@@ -15,6 +15,10 @@ LogBox.ignoreLogs([
   "Setting a timer for a long period of time, i.e. multiple minutes,",
 ]);
 
+LogBox.ignoreLogs([
+  "Deprecation warning: value provided is not in a recognized RFC2822 or ISO format.",
+]);
+
 export default function App() {
   return (
     <ThemeProvider>

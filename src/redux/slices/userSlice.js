@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import moment from "moment";
 
@@ -21,11 +21,25 @@ export const getUserById = createAsyncThunk(
   }
 );
 
+export const updateUserById = createAsyncThunk(
+  "user/updateUserById",
+  async (payload, { getState, rejectWithValue }) => {
+    try {
+      const { id } = getState().user.profile;
+      await updateDoc(doc(db, "users", id), payload);
+      return payload;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     profile: null,
     loading: false,
+    updating: false,
   },
   reducers: {
     login: (state, action) => {
@@ -35,6 +49,9 @@ export const userSlice = createSlice({
     logout: (state) => {
       state.profile = null;
     },
+    // update: (state, { payload }) => {
+    //   state.profile = { ...state.profile, ...payload }; //override part of previous stored state
+    // },
   },
   extraReducers: {
     [getUserById.pending]: (state) => {
@@ -48,11 +65,23 @@ export const userSlice = createSlice({
       state.loading = false;
       console.log(action.payload);
     },
+    [updateUserById.pending]: (state) => {
+      state.updating = true;
+    },
+    [updateUserById.fulfilled]: (state, { payload }) => {
+      state.updating = false;
+      state.profile = { ...state.profile, ...payload };
+    },
+    [updateUserById.rejected]: (state, action) => {
+      state.updating = false;
+      console.log(action.payload);
+    },
   },
 });
 
 export const { login, logout } = userSlice.actions;
 export const selectUser = (state) => state.user.profile;
 export const selectLoading = (state) => state.user.loading;
+export const selectUpdating = (state) => state.user.updating;
 
 export default userSlice.reducer;
