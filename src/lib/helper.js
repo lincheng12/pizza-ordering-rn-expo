@@ -86,9 +86,10 @@ export const creditCardType = (cc) => {
   let disco2 = new RegExp("^62[24568][0-9]{13}[0-9]*$");
   let disco3 = new RegExp("^6[45][0-9]{14}[0-9]*$");
 
-  if (visa.test(cc)) return "visa";
-  if (amex.test(cc)) return "american-express";
-  if (mastercard.test(cc) || mastercard2.test(cc)) return "mastercard";
-  if (disco1.test(cc) || disco2.test(cc) || disco3.test(cc)) return "discover";
-  return null;
+  if (visa.test(cc)) return ["visa", true];
+  if (amex.test(cc)) return ["american-express", true];
+  if (mastercard.test(cc) || mastercard2.test(cc)) return ["mastercard", true];
+  if (disco1.test(cc) || disco2.test(cc) || disco3.test(cc))
+    return ["discover", true];
+  return ["question", false];
 };

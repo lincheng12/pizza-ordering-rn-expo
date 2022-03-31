@@ -19,36 +19,34 @@ const EditInformationScreen = ({ route }) => {
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
   const dispatch = useDispatch();
-  // const [fname, setFname] = useState(userProfile.fname);
-  // const [lname, setLname] = useState(userProfile.lname);
-  // const [phone, setPhone] = useState(userProfile.phone);
-  const [address, setAddress] = useState(userProfile.address);
-  const [city, setCity] = useState(userProfile.city);
-  const [state, setState] = useState(userProfile.state);
-  const [zipcode, setZipcode] = useState(userProfile.zipcode);
-  const [card, setCard] = useState(userProfile.card);
-  const [cvv, setCVV] = useState(userProfile.cvv);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    watch,
+    formState: { errors, isDirty, dirtyFields },
   } = useForm({
     defaultValues: {
       fname: userProfile.fname,
       lname: userProfile.lname,
       phone: userProfile.phone,
+      address: userProfile.address,
+      city: userProfile.city,
+      state: userProfile.state,
+      zipcode: userProfile.zipcode,
+      card: userProfile.card,
+      cvv: userProfile.cvv,
     },
   });
 
   useLayoutEffect(() => {
     // Customizing the top header
     nav.setOptions({
-      headerTitle: displayHeaderTitle(),
+      headerTitle: evaluateType(),
     });
   }, []);
 
-  const displayHeaderTitle = () => {
+  const evaluateType = () => {
     switch (type) {
       case "profile":
         return "Personal Information";
@@ -56,47 +54,21 @@ const EditInformationScreen = ({ route }) => {
         return "Saved Address";
       case "payment":
         return "Payment Method";
-      case "rewards":
-        return "Rewards";
     }
   };
 
-  const onSubmit = (data) => console.log(data);
-  // const updateProfile = () => {
-  //   if (
-  //     (fname !== userProfile.fname ||
-  //       lname !== userProfile.lname ||
-  //       phone !== userProfile.phone) &&
-  //     fname !== "" &&
-  //     lname !== "" &&
-  //     phone !== ""
-  //   ) {
-  //     const doc = {
-  //       fname: fname.trim(),
-  //       lname: lname.trim(),
-  //       phone,
-  //     };
-  //     dispatch(updateUserById(doc));
-  //     alert("User profile updated");
-  //   } else {
-  //     alert("Can't update empty or same information");
-  //   }
-  // };
-
-  // const updateAddress = async () => {
-  //   if (
-  //     (address !== userProfile.address ||
-  //       city !== userProfile.city ||
-  //       state !== userProfile.state ||
-  //       zipcode !== userProfile.zipcode) &&
-  //     address !== "" &&
-  //     city !== "" &&
-  //     state !== "" &&
-  //     zipcode !== ""
-  //   ) {
-  //     await updateDoc(doc(db, "users", userProfile.id), {});
-  //   }
-  // };
+  const onSubmit = (data) => {
+    const res = Object.keys(dirtyFields).reduce(
+      (previousValue, currentValue) => ({
+        ...previousValue,
+        [currentValue]: data[currentValue],
+      }),
+      {}
+    );
+    return isDirty
+      ? dispatch(updateUserById(res))
+      : alert("No fields has change.");
+  };
 
   return (
     <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
@@ -107,10 +79,7 @@ const EditInformationScreen = ({ route }) => {
             <Controller
               control={control}
               rules={{
-                required: true,
-                validate: {
-                  check: (v) => v !== userProfile.fname,
-                },
+                required: "Field cannot be empty",
               }}
               render={({ field: { onChange, value } }) => (
                 <AppFloatingInput
@@ -123,14 +92,12 @@ const EditInformationScreen = ({ route }) => {
               name="fname"
             />
             {errors.fname && (
-              <Text style={{ color: "red" }}>
-                Value cannot be empty or contain the same value.
-              </Text>
+              <Text style={styles.error}>{errors.fname.message}</Text>
             )}
             <Controller
               control={control}
               rules={{
-                required: true,
+                required: "Field cannot be empty",
               }}
               render={({ field: { onChange, value } }) => (
                 <AppFloatingInput
@@ -142,11 +109,18 @@ const EditInformationScreen = ({ route }) => {
               )}
               name="lname"
             />
-            {errors.lname && <Text>This is required.</Text>}
+            {errors.lname && (
+              <Text style={styles.error}>{errors.lname.message}</Text>
+            )}
             <Controller
               control={control}
               rules={{
-                required: true,
+                required: "Field cannot be empty",
+                minLength: 9,
+                pattern: {
+                  value: /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/,
+                  message: "Not a valid phone input",
+                },
               }}
               render={({ field: { onChange, value } }) => (
                 <AppFloatingInput
@@ -162,7 +136,9 @@ const EditInformationScreen = ({ route }) => {
               )}
               name="phone"
             />
-            {errors.phone && <Text>This is required.</Text>}
+            {errors.phone && (
+              <Text style={styles.error}>{errors.phone.message}</Text>
+            )}
             <View style={{ paddingLeft: scale(3), marginTop: scale(5) }}>
               <AppText>Note: The email you provided is permanent.</AppText>
               <Text
@@ -189,87 +165,188 @@ const EditInformationScreen = ({ route }) => {
         {/* edit address */}
         {type === "address" && (
           <>
-            <AppFloatingInput
-              style={{ marginTop: scale(8) }}
-              label="Address"
-              value={address}
-              onChangeText={setAddress}
+            <Controller
+              control={control}
+              rules={{
+                required: "Field cannot be empty",
+                pattern: {
+                  value: /^\s*\S+(?:\s+\S+){2}/,
+                  message: "Not a valid address input",
+                },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <AppFloatingInput
+                  style={{ marginTop: scale(8) }}
+                  label="Address"
+                  hint="1234 Test St."
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+              name="address"
             />
+            {errors.address && (
+              <Text style={styles.error}>{errors.address.message}</Text>
+            )}
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
                 marginTop: scale(8),
               }}>
-              <AppFloatingInput
-                totalWidth="45%"
-                label="City"
-                value={city}
-                onChangeText={setCity}
+              <Controller
+                control={control}
+                rules={{
+                  required: "City field cannot be empty",
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <AppFloatingInput
+                    totalWidth="45%"
+                    label="City"
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+                name="city"
               />
-              <AppFloatingInput
-                totalWidth="20%"
-                label="State"
-                hint="AB"
-                mask="AB"
-                autoCapitalize="characters"
-                value={state}
-                onChangeText={setState}
+              <Controller
+                control={control}
+                rules={{
+                  required: "State field cannot be empty",
+                  pattern: {
+                    value:
+                      /^((A[LKSZR])|(C[AOT])|(D[EC])|(F[ML])|(G[AU])|(HI)|(I[DLNA])|(K[SY])|(LA)|(M[EHDAINSOT])|(N[EVHJMYCD])|(MP)|(O[HKR])|(P[WAR])|(RI)|(S[CD])|(T[NX])|(UT)|(V[TIA])|(W[AVIY]))$/,
+                    message: "State input is invalid",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <AppFloatingInput
+                    totalWidth="20%"
+                    label="State"
+                    hint="AB"
+                    mask="AB"
+                    autoCapitalize="characters"
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+                name="state"
               />
-              <AppFloatingInput
-                totalWidth="30%"
-                label="Zipcode"
-                hint="12345"
-                mask="12345"
-                keyboardType="number-pad"
-                value={zipcode}
-                onChangeText={setZipcode}
+              <Controller
+                control={control}
+                rules={{
+                  required: "Zipcode field cannot be empty",
+                  pattern: {
+                    value: /(^\d{5}$)|(^\d{5}-\d{4}$)/,
+                    message: "zipcode input is invalid",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <AppFloatingInput
+                    totalWidth="30%"
+                    label="Zipcode"
+                    hint="12345"
+                    mask="12345"
+                    keyboardType="number-pad"
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+                name="zipcode"
               />
             </View>
+            {errors.city && (
+              <Text style={styles.error}>{errors.city.message}</Text>
+            )}
+            {errors.state && (
+              <Text style={styles.error}>{errors.state.message}</Text>
+            )}
+            {errors.zipcode && (
+              <Text style={styles.error}>{errors.zipcode.message}</Text>
+            )}
           </>
         )}
         {/* edit payment */}
         {type === "payment" && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: scale(8),
-            }}>
+          <>
+            <AppText
+              style={{
+                fontSize: scale(11.5),
+                marginLeft: scale(3),
+                marginBottom: scale(5),
+              }}>
+              Accepts American Express, MasterCard, Visa, and Discover
+            </AppText>
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center",
-                width: "68%",
+                justifyContent: "space-between",
+                marginTop: scale(8),
               }}>
-              <AppFloatingInput
-                totalWidth="80%"
-                label="Credit Card"
-                maskType="card"
-                hint="1234 1234 1234 1234"
-                mask="1234 1234 1234 1234"
-                keyboardType="number-pad"
-                maxLength={19}
-                value={card}
-                onChangeText={setCard}
-              />
-              <Fontisto
-                style={{ marginLeft: scale(5) }}
-                name={creditCardType(card.split(" ").join(""))}
-                size={25}
-                color={colors.primary}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "68%",
+                }}>
+                <Controller
+                  control={control}
+                  rules={{
+                    required: "Credit card field cannot be empty",
+                    validate: {
+                      checkCard: (v) =>
+                        creditCardType(v.split(" ").join(""))[1] ||
+                        "Not a credit card that we accept",
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) => (
+                    <AppFloatingInput
+                      totalWidth="80%"
+                      label="Credit Card"
+                      maskType="card"
+                      hint="1234 1234 1234 1234"
+                      mask="1234 1234 1234 1234"
+                      keyboardType="number-pad"
+                      maxLength={19}
+                      value={value}
+                      onChangeText={onChange}
+                    />
+                  )}
+                  name="card"
+                />
+                <Fontisto
+                  style={{ marginLeft: scale(5) }}
+                  name={creditCardType(watch("card").split(" ").join(""))[0]}
+                  size={25}
+                  color={colors.primary}
+                />
+              </View>
+              <Controller
+                control={control}
+                rules={{
+                  required: "CVV field cannot be empty",
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <AppFloatingInput
+                    totalWidth="30%"
+                    label="Card CVV"
+                    hint="123"
+                    mask="123"
+                    keyboardType="number-pad"
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+                name="cvv"
               />
             </View>
-            <AppFloatingInput
-              totalWidth="30%"
-              label="Card CVV"
-              hint="123"
-              mask="123"
-              keyboardType="number-pad"
-              value={cvv}
-              onChangeText={setCVV}
-            />
-          </View>
+            {errors.card && (
+              <Text style={styles.error}>{errors.card.message}</Text>
+            )}
+            {errors.cvv && (
+              <Text style={styles.error}>{errors.cvv.message}</Text>
+            )}
+          </>
         )}
         <AppButton
           buttonContainerStyle={{
@@ -291,4 +368,8 @@ const EditInformationScreen = ({ route }) => {
 
 export default EditInformationScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  error: {
+    color: "red",
+  },
+});
