@@ -129,9 +129,9 @@ const ConfigurePizzaScreen = ({ route }) => {
         {/* if a pre-configured pizza is clicked, the pizza image will be shown  */}
         {item ? (
           <Image
-            resizeMode="cover"
+            resizeMode="contain"
             style={{ width: "100%", height: 280 }}
-            source={{ uri: item?.image }}
+            source={item?.image}
           />
         ) : (
           <Image

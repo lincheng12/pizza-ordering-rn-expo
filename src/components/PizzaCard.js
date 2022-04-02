@@ -20,7 +20,8 @@ const PizzaCard = (props) => {
         <Image
           resizeMode="cover"
           style={[styles.image, props.pizzaImageStyle]}
-          source={{ uri: props.image }}
+          source={props.image}
+          // source={{ uri: props.image }}
         />
         <View style={styles.titleAndPriceContainer}>
           <AppText {...props} style={[styles.name, props.pizzaNameStyle]}>
