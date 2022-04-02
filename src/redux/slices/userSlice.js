@@ -71,6 +71,7 @@ export const userSlice = createSlice({
     [updateUserById.fulfilled]: (state, { payload }) => {
       state.updating = false;
       state.profile = { ...state.profile, ...payload };
+      alert("Information updated successfully");
     },
     [updateUserById.rejected]: (state, action) => {
       state.updating = false;

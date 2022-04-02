@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Image, Platform } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Platform,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
@@ -114,14 +121,14 @@ const ProfileScreen = () => {
               <Text style={{ color: "white" }}>{userProfile.rewards}/12</Text>
             </View>
           </View>
-          <View
-            style={{
-              //borderWidth: 1,
-              flex: 1,
-              padding: scale(10),
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{
+              paddingVertical: scale(15),
+              paddingHorizontal: scale(10),
               justifyContent: "space-between",
             }}>
-            <View>
+            <View style={{ marginBottom: scale(20) }}>
               <TouchableCard
                 onPress={() =>
                   nav.navigate("EditInformation", { type: "profile" })
@@ -154,10 +161,13 @@ const ProfileScreen = () => {
                 onPress={() => alert("No information is collected")}
                 name="Private Policy"
               />
+              <TouchableCard
+                onPress={() => alert("It is a mystery")}
+                name="Terms and Services"
+              />
             </View>
             <AppButton
               buttonContainerStyle={{
-                bottom: scale(10),
                 paddingVertical: moderateScale(12),
                 width: "100%",
               }}
@@ -165,7 +175,7 @@ const ProfileScreen = () => {
               btnText="Logout"
               onPress={userLogout}
             />
-          </View>
+          </ScrollView>
         </>
       )}
     </AppView>

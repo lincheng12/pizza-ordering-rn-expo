@@ -19,7 +19,9 @@ const BasketCard = (props) => {
         shadowStyle,
       ]}>
       {!props.checkout && (
-        <TouchableOpacity onPress={props.onRemoveItem} style={styles.crossBtn}>
+        <TouchableOpacity
+          onPress={props.onRemoveItem}
+          style={[{ padding: scale(2), zIndex: 10 }, styles.crossBtn]}>
           <Entypo name="cross" size={24} color={colors.text} />
         </TouchableOpacity>
       )}

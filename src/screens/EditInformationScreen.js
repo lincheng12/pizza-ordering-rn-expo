@@ -1,23 +1,34 @@
 import { StyleSheet, Text, View, Pressable, Keyboard } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
+import {
+  selectUpdating,
+  selectUser,
+  updateUserById,
+} from "../redux/slices/userSlice";
+import {
+  addressRegex,
+  creditCardType,
+  phoneRegex,
+  stateRegex,
+  zipcodeRegex,
+} from "../lib/helper";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { selectUser, updateUserById } from "../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import AppFloatingInput from "../components/AppFloatingInput";
-import { moderateScale, scale, sWidth } from "../assets/Styles";
+import { moderateScale, scale } from "../assets/Styles";
 import { Fontisto } from "@expo/vector-icons";
-import { creditCardType } from "../lib/helper";
 import AppButton from "../components/AppButton";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
+import PaperTextInput from "../components/PaperTextInput";
 
 const EditInformationScreen = ({ route }) => {
   const { type } = route.params;
   const { colors } = useTheme();
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
+  const updatingState = useSelector(selectUpdating);
   const dispatch = useDispatch();
 
   const {
@@ -82,8 +93,7 @@ const EditInformationScreen = ({ route }) => {
                 required: "Field cannot be empty",
               }}
               render={({ field: { onChange, value } }) => (
-                <AppFloatingInput
-                  style={{ marginTop: scale(8) }}
+                <PaperTextInput
                   label="First Name"
                   value={value}
                   onChangeText={onChange}
@@ -100,8 +110,7 @@ const EditInformationScreen = ({ route }) => {
                 required: "Field cannot be empty",
               }}
               render={({ field: { onChange, value } }) => (
-                <AppFloatingInput
-                  style={{ marginTop: scale(8) }}
+                <PaperTextInput
                   label="Last Name"
                   value={value}
                   onChangeText={onChange}
@@ -123,15 +132,13 @@ const EditInformationScreen = ({ route }) => {
                 },
               }}
               render={({ field: { onChange, value } }) => (
-                <AppFloatingInput
-                  style={{ marginTop: scale(8) }}
+                <PaperTextInput
                   label="Phone"
-                  maskType="phone"
-                  mask="(123) 123-1234"
-                  hint="(123) 123-1234"
                   keyboardType="phone-pad"
-                  value={value}
+                  placeholder="(123) 123-1234"
+                  value={value.replace(phoneRegex, "($1) $2-$3")}
                   onChangeText={onChange}
+                  maxLength={14}
                 />
               )}
               name="phone"
@@ -139,7 +146,7 @@ const EditInformationScreen = ({ route }) => {
             {errors.phone && (
               <Text style={styles.error}>{errors.phone.message}</Text>
             )}
-            <View style={{ paddingLeft: scale(3), marginTop: scale(5) }}>
+            <View style={{ paddingLeft: scale(3), marginTop: scale(12) }}>
               <AppText>Note: The email you provided is permanent.</AppText>
               <Text
                 style={{
@@ -170,15 +177,14 @@ const EditInformationScreen = ({ route }) => {
               rules={{
                 required: "Field cannot be empty",
                 pattern: {
-                  value: /^\s*\S+(?:\s+\S+){2}/,
+                  value: addressRegex,
                   message: "Not a valid address input",
                 },
               }}
               render={({ field: { onChange, value } }) => (
-                <AppFloatingInput
-                  style={{ marginTop: scale(8) }}
+                <PaperTextInput
                   label="Address"
-                  hint="1234 Test St."
+                  placeholder="1234 Test St."
                   value={value}
                   onChangeText={onChange}
                 />
@@ -192,7 +198,6 @@ const EditInformationScreen = ({ route }) => {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                marginTop: scale(8),
               }}>
               <Controller
                 control={control}
@@ -200,11 +205,11 @@ const EditInformationScreen = ({ route }) => {
                   required: "City field cannot be empty",
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <AppFloatingInput
-                    totalWidth="45%"
+                  <PaperTextInput
                     label="City"
                     value={value}
                     onChangeText={onChange}
+                    style={{ width: "45%" }}
                   />
                 )}
                 name="city"
@@ -214,20 +219,19 @@ const EditInformationScreen = ({ route }) => {
                 rules={{
                   required: "State field cannot be empty",
                   pattern: {
-                    value:
-                      /^((A[LKSZR])|(C[AOT])|(D[EC])|(F[ML])|(G[AU])|(HI)|(I[DLNA])|(K[SY])|(LA)|(M[EHDAINSOT])|(N[EVHJMYCD])|(MP)|(O[HKR])|(P[WAR])|(RI)|(S[CD])|(T[NX])|(UT)|(V[TIA])|(W[AVIY]))$/,
+                    value: stateRegex,
                     message: "State input is invalid",
                   },
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <AppFloatingInput
-                    totalWidth="20%"
+                  <PaperTextInput
                     label="State"
-                    hint="AB"
-                    mask="AB"
+                    placeholder="AB"
                     autoCapitalize="characters"
                     value={value}
                     onChangeText={onChange}
+                    style={{ width: "20%" }}
+                    maxLength={2}
                   />
                 )}
                 name="state"
@@ -237,19 +241,19 @@ const EditInformationScreen = ({ route }) => {
                 rules={{
                   required: "Zipcode field cannot be empty",
                   pattern: {
-                    value: /(^\d{5}$)|(^\d{5}-\d{4}$)/,
+                    value: zipcodeRegex,
                     message: "zipcode input is invalid",
                   },
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <AppFloatingInput
-                    totalWidth="30%"
+                  <PaperTextInput
                     label="Zipcode"
-                    hint="12345"
-                    mask="12345"
+                    placeholder="12345"
                     keyboardType="number-pad"
                     value={value}
                     onChangeText={onChange}
+                    maxLength={5}
+                    style={{ width: "30%" }}
                   />
                 )}
                 name="zipcode"
@@ -271,23 +275,22 @@ const EditInformationScreen = ({ route }) => {
           <>
             <AppText
               style={{
-                fontSize: scale(11.5),
+                fontSize: scale(11),
+                marginBottom: scale(8),
                 marginLeft: scale(3),
-                marginBottom: scale(5),
               }}>
-              Accepts American Express, MasterCard, Visa, and Discover
+              Accepting American Express, MasterCard, Visa, and Discover
             </AppText>
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                marginTop: scale(8),
               }}>
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  width: "68%",
+                  width: "74%",
                 }}>
                 <Controller
                   control={control}
@@ -300,22 +303,23 @@ const EditInformationScreen = ({ route }) => {
                     },
                   }}
                   render={({ field: { onChange, value } }) => (
-                    <AppFloatingInput
-                      totalWidth="80%"
+                    <PaperTextInput
                       label="Credit Card"
-                      maskType="card"
-                      hint="1234 1234 1234 1234"
-                      mask="1234 1234 1234 1234"
+                      placeholder="1234 1234 1234 1234"
                       keyboardType="number-pad"
-                      maxLength={19}
-                      value={value}
+                      value={value
+                        .replace(/\s?/g, "")
+                        .replace(/(\d{4})/g, "$1 ")
+                        .trim()}
                       onChangeText={onChange}
+                      style={{ width: "80%" }}
+                      maxLength={19}
                     />
                   )}
                   name="card"
                 />
                 <Fontisto
-                  style={{ marginLeft: scale(5) }}
+                  style={{ marginLeft: scale(5), marginTop: scale(8) }}
                   name={creditCardType(watch("card").split(" ").join(""))[0]}
                   size={25}
                   color={colors.primary}
@@ -327,14 +331,14 @@ const EditInformationScreen = ({ route }) => {
                   required: "CVV field cannot be empty",
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <AppFloatingInput
-                    totalWidth="30%"
-                    label="Card CVV"
-                    hint="123"
-                    mask="123"
+                  <PaperTextInput
+                    label="CVV"
+                    placeholder="123"
                     keyboardType="number-pad"
                     value={value}
                     onChangeText={onChange}
+                    maxLength={3}
+                    style={{ width: "25%" }}
                   />
                 )}
                 name="cvv"
@@ -350,13 +354,14 @@ const EditInformationScreen = ({ route }) => {
         )}
         <AppButton
           buttonContainerStyle={{
-            paddingVertical: moderateScale(12),
+            paddingVertical: moderateScale(13),
             marginTop: scale(18),
             width: "100%",
             position: "absolute",
             alignSelf: "center",
-            bottom: scale(50),
+            bottom: scale(40),
           }}
+          isLoading={updatingState}
           bgColor={colors.primary}
           btnText="Update"
           onPress={handleSubmit(onSubmit)}
@@ -371,5 +376,6 @@ export default EditInformationScreen;
 const styles = StyleSheet.create({
   error: {
     color: "red",
+    marginLeft: scale(3),
   },
 });

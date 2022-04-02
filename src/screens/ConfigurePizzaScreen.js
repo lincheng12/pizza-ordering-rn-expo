@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToBasket, selectTotalCount } from "../redux/slices/basketSlice";
 import QuantityCounter from "../components/QuantityCounter";
 import AppButton from "../components/AppButton";
+import * as Haptics from "expo-haptics";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
@@ -89,6 +90,7 @@ const ConfigurePizzaScreen = ({ route }) => {
   };
 
   const addPizza = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const name = item?.name;
     if (ingredients.length > 0) {
       const item = {
@@ -106,6 +108,7 @@ const ConfigurePizzaScreen = ({ route }) => {
   };
 
   const checkoutSinglePizza = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const name = item?.name;
     if (ingredients.length > 0) {
       const item = {

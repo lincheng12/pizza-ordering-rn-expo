@@ -22,14 +22,15 @@ import {
 } from "../../assets/Styles";
 import AppLoading from "expo-app-loading";
 import { useFonts, Lobster_400Regular } from "@expo-google-fonts/lobster";
-import { FloatingLabelInput } from "react-native-floating-label-input";
-import { Ionicons } from "@expo/vector-icons";
 import AppText from "../../components/AppText";
 import useThemePreference from "../../hooks/useThemePreference";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { getUserById } from "../../redux/slices/userSlice";
+import { TextInput } from "react-native-paper";
+import PaperTextInput from "../../components/PaperTextInput";
+import { Controller, useForm } from "react-hook-form";
 
 const LoginScreen = () => {
   const nav = useNavigation();
@@ -37,8 +38,17 @@ const LoginScreen = () => {
   const { themePreference } = useThemePreference();
   const { colors } = useTheme();
   const insects = useSafeAreaInsets();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [passVisible, setPassVisible] = useState(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   let [fontsLoaded] = useFonts({
     Lobster_400Regular,
   });
@@ -47,7 +57,7 @@ const LoginScreen = () => {
     return <AppLoading />;
   }
 
-  const signIn = async () => {
+  const onSubmit = async ({ email, password }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -117,72 +127,62 @@ const LoginScreen = () => {
             </View>
             <View
               style={{
-                marginBottom: scale(15),
+                marginBottom: scale(20),
                 marginTop: scale(-20),
                 width: "100%",
               }}>
-              <FloatingLabelInput
-                label="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                animationDuration={150}
-                leftComponent={
-                  <Ionicons name="ios-person-outline" size={24} color="gray" />
-                }
-                containerStyles={styles.outerInputContainer}
-                customLabelStyles={{
-                  colorFocused: colors.primary,
-                  fontSizeFocused: scale(12),
-                  colorBlurred: "gray",
-                  fontSizeBlurred: scale(14),
+              <Controller
+                control={control}
+                rules={{
+                  required: "Field cannot be empty",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Not a valid email format",
+                  },
                 }}
-                labelStyles={styles.labelContainerStyle}
-                inputStyles={{
-                  color: colors.text,
-                  paddingHorizontal: scale(10),
-                  paddingVertical: scale(8),
-                  fontSize: scale(14.2),
-                }}
-                onChangeText={setEmail}
+                render={({ field: { onChange, value } }) => (
+                  <PaperTextInput
+                    label="Email"
+                    placeholder="test@email.com"
+                    value={value.trim()}
+                    onChangeText={onChange}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    style={{ backgroundColor: "transparent", marginBottom: 0 }}
+                  />
+                )}
+                name="email"
               />
-              <FloatingLabelInput
-                label="Password"
-                value={password}
-                animationDuration={150}
-                maxLength={8}
-                showCountdown
-                showCountdownStyles={{
-                  color: colors.text,
-                  position: "absolute",
-                  bottom: scale(-14),
+              {errors.email && (
+                <Text style={styles.error}>{errors.email.message}</Text>
+              )}
+              <Controller
+                control={control}
+                rules={{
+                  required: "Field cannot be empty",
                 }}
-                leftComponent={
-                  <Ionicons name="key-outline" size={24} color="gray" />
-                }
-                customShowPasswordComponent={
-                  <Ionicons name="eye-outline" size={24} color="gray" />
-                }
-                customHidePasswordComponent={
-                  <Ionicons name="eye-off-outline" size={24} color="gray" />
-                }
-                isPassword={true}
-                containerStyles={styles.outerInputContainer}
-                customLabelStyles={{
-                  colorFocused: colors.primary,
-                  fontSizeFocused: scale(12),
-                  colorBlurred: "gray",
-                  fontSizeBlurred: scale(14),
-                }}
-                labelStyles={styles.labelContainerStyle}
-                inputStyles={{
-                  color: colors.text,
-                  paddingHorizontal: scale(10),
-                  paddingVertical: scale(8),
-                  fontSize: scale(14.2),
-                }}
-                onChangeText={setPassword}
+                render={({ field: { onChange, value } }) => (
+                  <PaperTextInput
+                    label="Password"
+                    value={value}
+                    onChangeText={onChange}
+                    secureTextEntry={passVisible}
+                    maxLength={8}
+                    right={
+                      <TextInput.Icon
+                        name={passVisible ? "eye" : "eye-off"}
+                        onPress={() => setPassVisible(!passVisible)}
+                        color="#aaa"
+                      />
+                    }
+                    style={{ backgroundColor: "transparent", marginBottom: 0 }}
+                  />
+                )}
+                name="password"
               />
+              {errors.password && (
+                <Text style={styles.error}>{errors.password.message}</Text>
+              )}
             </View>
             <AppButton
               buttonContainerStyle={{
@@ -192,7 +192,7 @@ const LoginScreen = () => {
               }}
               bgColor={colors.primary}
               btnText="Login"
-              onPress={signIn}
+              onPress={handleSubmit(onSubmit)}
             />
           </View>
           <TouchableOpacity
@@ -216,18 +216,8 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  outerInputContainer: {
-    borderBottomWidth: 2,
-    paddingHorizontal: scale(3),
-    borderColor: "gray",
-    marginVertical: Platform.OS === "android" ? scale(6) : scale(12),
-  },
-  labelContainerStyle: {
-    paddingHorizontal: scale(5),
-  },
-  inputStyle: {
-    color: "black",
-    paddingHorizontal: scale(10),
-    paddingVertical: scale(8),
+  error: {
+    color: "red",
+    marginLeft: scale(3),
   },
 });

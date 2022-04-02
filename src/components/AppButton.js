@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
+import { ActivityIndicator } from "react-native-paper";
 
 const AppButton = (props) => {
   return (
@@ -21,6 +22,36 @@ const AppButton = (props) => {
               styles.baseBtnStyle,
               props.buttonContainerStyle,
             ]}>
+            {props.isLoading ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text
+                style={[
+                  {
+                    textAlign: "center",
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: moderateScale(16),
+                  },
+                  props.btnTextStyle,
+                ]}>
+                {props.btnText}
+              </Text>
+            )}
+          </View>
+        </TouchableNativeFeedback>
+      ) : (
+        <TouchableOpacity
+          {...props}
+          style={[
+            { backgroundColor: props.bgColor },
+            shadowStyle,
+            styles.baseBtnStyle,
+            props.buttonContainerStyle,
+          ]}>
+          {props.isLoading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
             <Text
               style={[
                 {
@@ -33,29 +64,7 @@ const AppButton = (props) => {
               ]}>
               {props.btnText}
             </Text>
-          </View>
-        </TouchableNativeFeedback>
-      ) : (
-        <TouchableOpacity
-          {...props}
-          style={[
-            { backgroundColor: props.bgColor },
-            shadowStyle,
-            styles.baseBtnStyle,
-            props.buttonContainerStyle,
-          ]}>
-          <Text
-            style={[
-              {
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: moderateScale(16),
-              },
-              props.btnTextStyle,
-            ]}>
-            {props.btnText}
-          </Text>
+          )}
         </TouchableOpacity>
       )}
     </>

@@ -17,6 +17,7 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import BasketCard from "../components/BasketCard";
 import AppButton from "../components/AppButton";
+import * as Haptics from "expo-haptics";
 
 const BasketScreen = () => {
   const { colors } = useTheme();
@@ -40,6 +41,16 @@ const BasketScreen = () => {
     });
   }, [totalCost]);
 
+  const removeItem = (id) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    dispatch(removeFromBasket(id));
+  };
+
+  const checkout = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    nav.navigate("Checkout", { type: "multiple" });
+  };
+
   return (
     <AppView style={{ flex: 1 }}>
       {pizzaItems.length === 0 ? (
@@ -59,7 +70,7 @@ const BasketScreen = () => {
             {pizzaItems.map((item, index) => (
               <BasketCard
                 key={index}
-                onRemoveItem={() => dispatch(removeFromBasket(item.id))}
+                onRemoveItem={() => removeItem(item.id)}
                 pizzaName={item.pizzaName}
                 pizzaSize={item.pizzaBase[0]}
                 pizzaSizeDetails={item.pizzaBase[0]}
@@ -86,7 +97,7 @@ const BasketScreen = () => {
               btnText="Clear"
             />
             <AppButton
-              onPress={() => nav.navigate("Checkout", { type: "multiple" })}
+              onPress={checkout}
               buttonContainerStyle={styles.checkoutBtn}
               bgColor={colors.primary}
               btnText={`Checkout (${totalCount} items)`}

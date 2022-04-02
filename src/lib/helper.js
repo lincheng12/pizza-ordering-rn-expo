@@ -1,6 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { menu } from "../assets/menu";
 
+export const emailRegex = /\S+@\S+\.\S+/;
+export const addressRegex = /^\s*\S+(?:\s+\S+){2}/;
+export const stateRegex =
+  /^((A[LKSZR])|(C[AOT])|(D[EC])|(F[ML])|(G[AU])|(HI)|(I[DLNA])|(K[SY])|(LA)|(M[EHDAINSOT])|(N[EVHJMYCD])|(MP)|(O[HKR])|(P[WAR])|(RI)|(S[CD])|(T[NX])|(UT)|(V[TIA])|(W[AVIY]))$/;
+export const zipcodeRegex = /(^\d{5}$)|(^\d{5}-\d{4}$)/;
+export const phoneRegex = /^(\d{3})(\d{3})(\d{4}).*/;
+
 /**
  * Removes item for a key stored in async storage
  * @param {string} itemKey - async storage string value
@@ -91,5 +98,5 @@ export const creditCardType = (cc) => {
   if (mastercard.test(cc) || mastercard2.test(cc)) return ["mastercard", true];
   if (disco1.test(cc) || disco2.test(cc) || disco3.test(cc))
     return ["discover", true];
-  return ["question", false];
+  return ["", false];
 };
