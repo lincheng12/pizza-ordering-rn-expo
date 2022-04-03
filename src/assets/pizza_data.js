@@ -63,3 +63,18 @@ export const pizzData = [
     price: 12.0,
   },
 ];
+
+export const returnPizzaImage = (name) => {
+  switch (name) {
+    case "Pepperoni Pizza":
+      return require("./pepperoni_pizza.png");
+    case "Veggie Pizza":
+      return require("./veggie_pizza.png");
+    case "BBQ Chicken Pizza":
+      return require("./chicken_pizza.png");
+    case "Deluxe Pizza":
+      return require("./chicken_pizza.png");
+    case "Glaze Pizza":
+      return require("./glaze_pizza.png");
+  }
+};

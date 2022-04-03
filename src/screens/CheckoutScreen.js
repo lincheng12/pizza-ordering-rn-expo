@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import React, { useState } from "react";
 import {
   selectItems,
@@ -16,26 +16,38 @@ import {
 } from "../lib/helper";
 import AppText from "../components/AppText";
 import AppView from "../components/AppView";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import BasketCard from "../components/BasketCard";
 import { moderateScale, scale } from "../assets/Styles";
 import { Fontisto } from "@expo/vector-icons";
-import { useTheme } from "@react-navigation/native";
+import {
+  StackActions,
+  useNavigation,
+  useTheme,
+} from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppButton from "../components/AppButton";
 import { Controller, useForm } from "react-hook-form";
 import PaperTextInput from "../components/PaperTextInput";
 import { selectUser } from "../redux/slices/userSlice";
+import { Switch } from "react-native-paper";
+import uuid from "react-native-uuid";
+import { serverTimestamp } from "firebase/firestore";
+import { selectProcessing, storeOrdersById } from "../redux/slices/orderSlice";
 
 const CheckoutScreen = ({ route }) => {
   const { item, type } = route.params;
   const { colors } = useTheme();
+  const [isDelivery, setIsDelivery] = useState(false);
+  const nav = useNavigation();
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
   const pizzaItems = useSelector(selectItems);
   const pizzaTotal = useSelector(selectTotal);
   const totalCount = useSelector(selectTotalCount);
   const userProfile = useSelector(selectUser);
+  const processingState = useSelector(selectProcessing);
   const {
     control,
     handleSubmit,
@@ -46,7 +58,6 @@ const CheckoutScreen = ({ route }) => {
       fname: userProfile.fname,
       lname: userProfile.lname,
       email: userProfile.email,
-      password: userProfile.password,
       phone: userProfile.phone,
       address: userProfile.address,
       city: userProfile.city,
@@ -56,6 +67,28 @@ const CheckoutScreen = ({ route }) => {
       cvv: userProfile.cvv,
     },
   });
+
+  const onSubmit = (data) => {
+    const orderObj = {
+      id: uuid.v4(),
+      items: type === "single" ? [item] : pizzaItems,
+      meta: { ...data },
+      delivery: isDelivery,
+      price: type === "single" ? item.price * item.quantity : pizzaTotal,
+      timePlaced: serverTimestamp(),
+    };
+
+    dispatch(storeOrdersById(orderObj))
+      .unwrap()
+      .then((promiseResult) => {
+        // console.log("result: ", promiseResult);
+        alert("Your order was successfully placed");
+        nav.dispatch(StackActions.popToTop());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <AppView style={{ flex: 1, paddingBottom: insets.bottom }}>
@@ -158,105 +191,123 @@ const CheckoutScreen = ({ route }) => {
             <Text style={styles.error}>{errors.email.message}</Text>
           )}
         </View>
-        <View style={styles.sectionContainer}>
-          <AppText style={styles.text}>Enter your address:</AppText>
-          <Controller
-            control={control}
-            rules={{
-              required: "Field cannot be empty",
-              pattern: {
-                value: addressRegex,
-                message: "Not a valid address input",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <PaperTextInput
-                label="Address"
-                placeholder="1234 Test St."
-                value={value}
-                onChangeText={onChange}
-              />
-            )}
-            name="address"
-          />
-          {errors.address && (
-            <Text style={styles.error}>{errors.address.message}</Text>
-          )}
-          <View
-            style={{
+        <View
+          style={[
+            styles.sectionContainer,
+            {
               flexDirection: "row",
               justifyContent: "space-between",
-            }}>
-            <Controller
-              control={control}
-              rules={{
-                required: "City field cannot be empty",
-              }}
-              render={({ field: { onChange, value } }) => (
-                <PaperTextInput
-                  label="City"
-                  value={value}
-                  onChangeText={onChange}
-                  style={{ width: "45%" }}
-                />
-              )}
-              name="city"
-            />
-            <Controller
-              control={control}
-              rules={{
-                required: "State field cannot be empty",
-                pattern: {
-                  value: stateRegex,
-                  message: "State input is invalid",
-                },
-              }}
-              render={({ field: { onChange, value } }) => (
-                <PaperTextInput
-                  label="State"
-                  placeholder="AB"
-                  autoCapitalize="characters"
-                  value={value}
-                  onChangeText={onChange}
-                  style={{ width: "20%" }}
-                  maxLength={2}
-                />
-              )}
-              name="state"
-            />
-            <Controller
-              control={control}
-              rules={{
-                required: "Zipcode field cannot be empty",
-                pattern: {
-                  value: zipcodeRegex,
-                  message: "zipcode input is invalid",
-                },
-              }}
-              render={({ field: { onChange, value } }) => (
-                <PaperTextInput
-                  label="Zipcode"
-                  placeholder="12345"
-                  keyboardType="number-pad"
-                  value={value}
-                  onChangeText={onChange}
-                  maxLength={5}
-                  style={{ width: "30%" }}
-                />
-              )}
-              name="zipcode"
-            />
-          </View>
-          {errors.city && (
-            <Text style={styles.error}>{errors.city.message}</Text>
-          )}
-          {errors.state && (
-            <Text style={styles.error}>{errors.state.message}</Text>
-          )}
-          {errors.zipcode && (
-            <Text style={styles.error}>{errors.zipcode.message}</Text>
-          )}
+              alignItems: "center",
+            },
+          ]}>
+          <AppText style={styles.text}>Is this order for delivery?</AppText>
+          <Switch
+            value={isDelivery}
+            onValueChange={() => setIsDelivery(!isDelivery)}
+            color={colors.primary}
+          />
         </View>
+        {isDelivery && (
+          <View style={styles.sectionContainer}>
+            <AppText style={styles.text}>Enter your address:</AppText>
+            <Controller
+              control={control}
+              rules={{
+                required: "Field cannot be empty",
+                pattern: {
+                  value: addressRegex,
+                  message: "Not a valid address input",
+                },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <PaperTextInput
+                  label="Address"
+                  placeholder="1234 Test St."
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+              name="address"
+            />
+            {errors.address && (
+              <Text style={styles.error}>{errors.address.message}</Text>
+            )}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}>
+              <Controller
+                control={control}
+                rules={{
+                  required: "City field cannot be empty",
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <PaperTextInput
+                    label="City"
+                    value={value}
+                    onChangeText={onChange}
+                    style={{ width: "45%" }}
+                  />
+                )}
+                name="city"
+              />
+              <Controller
+                control={control}
+                rules={{
+                  required: "State field cannot be empty",
+                  pattern: {
+                    value: stateRegex,
+                    message: "State input is invalid",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <PaperTextInput
+                    label="State"
+                    placeholder="AB"
+                    autoCapitalize="characters"
+                    value={value}
+                    onChangeText={onChange}
+                    style={{ width: "20%" }}
+                    maxLength={2}
+                  />
+                )}
+                name="state"
+              />
+              <Controller
+                control={control}
+                rules={{
+                  required: "Zipcode field cannot be empty",
+                  pattern: {
+                    value: zipcodeRegex,
+                    message: "zipcode input is invalid",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <PaperTextInput
+                    label="Zipcode"
+                    placeholder="12345"
+                    keyboardType="number-pad"
+                    value={value}
+                    onChangeText={onChange}
+                    maxLength={5}
+                    style={{ width: "30%" }}
+                  />
+                )}
+                name="zipcode"
+              />
+            </View>
+            {errors.city && (
+              <Text style={styles.error}>{errors.city.message}</Text>
+            )}
+            {errors.state && (
+              <Text style={styles.error}>{errors.state.message}</Text>
+            )}
+            {errors.zipcode && (
+              <Text style={styles.error}>{errors.zipcode.message}</Text>
+            )}
+          </View>
+        )}
         <View style={styles.sectionContainer}>
           <AppText style={styles.text}>Enter the remaining:</AppText>
           <View
@@ -354,6 +405,7 @@ const CheckoutScreen = ({ route }) => {
         </View>
         <View style={styles.sectionContainer}>
           <AppButton
+            isLoading={processingState}
             buttonContainerStyle={styles.checkoutBtn}
             bgColor={colors.primary}
             btnText={`Pay ${
@@ -361,6 +413,7 @@ const CheckoutScreen = ({ route }) => {
                 ? formatPrice(item.price * item.quantity)
                 : formatPrice(pizzaTotal)
             }`}
+            onPress={handleSubmit(onSubmit)}
           />
         </View>
       </KeyboardAwareScrollView>

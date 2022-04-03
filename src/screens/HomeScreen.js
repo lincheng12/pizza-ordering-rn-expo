@@ -23,10 +23,15 @@ import { Foundation } from "@expo/vector-icons";
 import AppTouchable from "../components/AppTouchable";
 import PizzaCard from "../components/PizzaCard";
 import AppButton from "../components/AppButton";
+import { useSelector } from "react-redux";
+import { selectLastOrder } from "../redux/slices/orderSlice";
+import moment from "moment";
 
 const HomeScreen = () => {
   const { colors } = useTheme();
   const nav = useNavigation();
+  const lastOrder = useSelector(selectLastOrder);
+
   return (
     <AppView style={{ flex: 1 }}>
       <ScrollView
@@ -98,15 +103,68 @@ const HomeScreen = () => {
             height: scale(200),
             marginTop: scale(5),
           }}>
-          <AppText style={styles.heading}>Last order</AppText>
-          <View
-            style={{
-              backgroundColor: colors.background,
-              height: scale(140),
-              marginHorizontal: scale(8),
-              // width: "100%",
-              // marginHorizontal: scale(8),
-            }}></View>
+          <View style={styles.headerTopContainer}>
+            <AppText style={styles.heading}>Last order</AppText>
+            <TouchableOpacity
+            // onPress={() => nav.navigate("PizzaSelectionDetails")}
+            >
+              <AppText
+                style={{
+                  color: colors.primary,
+                  marginRight: scale(8),
+                  fontSize: scale(14.5),
+                }}>
+                Summary
+              </AppText>
+            </TouchableOpacity>
+          </View>
+          {lastOrder !== {} && (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal={true}
+              contentContainerStyle={styles.horizontalScrollContainer}
+              style={{ flex: 1 }}>
+              {lastOrder?.items?.map((item, index) => (
+                <View
+                  key={index}
+                  style={[
+                    {
+                      backgroundColor: colors.background,
+                      height: scale(120),
+                      marginHorizontal: scale(6),
+                      width: scale(230),
+                      // marginHorizontal: scale(8),
+                      padding: scale(10),
+                      borderRadius: 10,
+                      justifyContent: "space-between",
+                    },
+                    shadowStyle,
+                  ]}>
+                  <View>
+                    <AppText
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: scale(16),
+                        marginBottom: scale(2),
+                      }}>
+                      {item.pizzaName}
+                    </AppText>
+                    <AppText>
+                      Ordered: {moment(lastOrder.timePlaced).fromNow()}
+                    </AppText>
+                  </View>
+                  <AppButton
+                    buttonContainerStyle={{
+                      paddingVertical: scale(7.5),
+                    }}
+                    btnTextStyle={{ fontSize: scale(13.5) }}
+                    bgColor={colors.primary}
+                    btnText="Order again"
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
         <View
           style={[

@@ -2,11 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import moment from "moment";
+import { getAllOrdersById } from "./orderSlice";
 
 export const getUserById = createAsyncThunk(
   "user/getUserById",
-  async (userId, { rejectWithValue }) => {
+  async (userId, { dispatch, rejectWithValue }) => {
     try {
+      dispatch(getAllOrdersById(userId));
       const profileObj = await getDoc(doc(db, "users", userId));
       if (profileObj.exists()) {
         //console.log(profileObj.data());
