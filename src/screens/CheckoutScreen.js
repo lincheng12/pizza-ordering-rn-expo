@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text } from "react-native";
 import React, { useState } from "react";
 import {
+  clearBasket,
   selectItems,
   selectTotal,
   selectTotalCount,
@@ -80,8 +81,11 @@ const CheckoutScreen = ({ route }) => {
 
     dispatch(storeOrdersById(orderObj))
       .unwrap()
-      .then((promiseResult) => {
+      .then(() => {
         // console.log("result: ", promiseResult);
+        if (type === "multiple") {
+          dispatch(clearBasket());
+        }
         alert("Your order was successfully placed");
         nav.dispatch(StackActions.popToTop());
       })

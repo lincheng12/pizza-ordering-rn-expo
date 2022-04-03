@@ -6,8 +6,9 @@ import {
   Platform,
   TouchableOpacity,
   Text,
+  Pressable,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import {
@@ -19,18 +20,22 @@ import {
 } from "../assets/Styles";
 import { pizzData } from "../assets/pizza_data";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { Foundation } from "@expo/vector-icons";
+import { Foundation, Entypo } from "@expo/vector-icons";
 import AppTouchable from "../components/AppTouchable";
 import PizzaCard from "../components/PizzaCard";
 import AppButton from "../components/AppButton";
 import { useSelector } from "react-redux";
 import { selectLastOrder } from "../redux/slices/orderSlice";
 import moment from "moment";
+import Modal from "react-native-modal";
 
 const HomeScreen = () => {
   const { colors } = useTheme();
   const nav = useNavigation();
   const lastOrder = useSelector(selectLastOrder);
+  const [visible, setVisible] = useState(false);
+
+  const toggleModal = () => setVisible(!visible);
 
   return (
     <AppView style={{ flex: 1 }}>
@@ -100,14 +105,12 @@ const HomeScreen = () => {
         <View
           style={{
             backgroundColor: colors.card,
-            height: scale(200),
+            height: scale(190),
             marginTop: scale(5),
           }}>
           <View style={styles.headerTopContainer}>
             <AppText style={styles.heading}>Last order</AppText>
-            <TouchableOpacity
-            // onPress={() => nav.navigate("PizzaSelectionDetails")}
-            >
+            <TouchableOpacity onPress={toggleModal}>
               <AppText
                 style={{
                   color: colors.primary,
@@ -117,6 +120,37 @@ const HomeScreen = () => {
                 Summary
               </AppText>
             </TouchableOpacity>
+            <Modal
+              useNativeDriver
+              useNativeDriverForBackdrop
+              animationIn="slideInDown"
+              animationOut="slideOutUp"
+              isVisible={visible}
+              onBackdropPress={toggleModal}>
+              <View
+                style={{
+                  position: "relative",
+                  width: scale(300),
+                  height: scale(400),
+                  backgroundColor: colors.card,
+                  borderRadius: 10,
+                }}>
+                <Pressable
+                  onPress={toggleModal}
+                  style={{
+                    position: "absolute",
+                    backgroundColor: colors.notification,
+                    padding: scale(10),
+                    top: scale(-12),
+                    right: scale(-10),
+                    borderRadius: 50,
+                    zIndex: 20,
+                  }}>
+                  <Entypo name="cross" size={24} color="white" />
+                </Pressable>
+                <AppText>Hello</AppText>
+              </View>
+            </Modal>
           </View>
           {lastOrder !== {} && (
             <ScrollView
@@ -171,7 +205,7 @@ const HomeScreen = () => {
             {
               height: scale(440),
               backgroundColor: colors.card,
-              marginTop: scale(5),
+              marginTop: scale(10),
               paddingBottom: scale(20),
             },
             shadowStyle,
