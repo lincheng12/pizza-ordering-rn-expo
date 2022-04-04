@@ -6,12 +6,17 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectLoading, selectUser } from "../redux/slices/userSlice";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import {
+  useNavigation,
+  useScrollToTop,
+  useTheme,
+  useIsFocused,
+} from "@react-navigation/native";
 import {
   moderateScale,
   scale,
@@ -32,12 +37,18 @@ const ProfileScreen = () => {
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
   const loading = useSelector(selectLoading);
+  const scrollRef = useRef(null);
+  const isFocused = useIsFocused();
   const dispatch = useDispatch();
   let [fontsLoaded] = useFonts({
     Lobster_400Regular,
   });
 
-  //console.log(userProfile);
+  // useScrollToTop(scrollRef);
+
+  useEffect(() => {
+    if (!isFocused) scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+  }, [isFocused]);
 
   const userLogout = () => {
     signOut(auth)
@@ -55,7 +66,6 @@ const ProfileScreen = () => {
     );
   }
 
-  //console.log(userProfile);
   return (
     <AppView style={{ flex: 1 }}>
       {userProfile === null ? (
@@ -122,6 +132,7 @@ const ProfileScreen = () => {
             </View>
           </View>
           <ScrollView
+            ref={scrollRef}
             style={{ flex: 1 }}
             contentContainerStyle={{
               paddingVertical: scale(15),

@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
 import { useSelector } from "react-redux";
@@ -53,10 +53,16 @@ const ListHeader = () => {
 const OrdersScreen = () => {
   const orders = useSelector(selectAllOrders);
   const { colors } = useTheme();
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollToOffset({ offset: 0 });
+  }, [orders]);
 
   return (
     <AppView style={{ flex: 1 }}>
       <FlatList
+        ref={scrollRef}
         ListHeaderComponent={<ListHeader />}
         maxToRenderPerBatch={10}
         showsVerticalScrollIndicator={false}
