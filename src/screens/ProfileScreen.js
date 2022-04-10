@@ -5,15 +5,14 @@ import {
   Image,
   Platform,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useRef, useEffect } from "react";
 import AppView from "../components/AppView";
-import AppText from "../components/AppText";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectLoading, selectUser } from "../redux/slices/userSlice";
 import {
   useNavigation,
-  useScrollToTop,
   useTheme,
   useIsFocused,
 } from "@react-navigation/native";
@@ -44,8 +43,6 @@ const ProfileScreen = () => {
     Lobster_400Regular,
   });
 
-  // useScrollToTop(scrollRef);
-
   useEffect(() => {
     if (!isFocused) scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   }, [isFocused]);
@@ -58,6 +55,8 @@ const ProfileScreen = () => {
       .catch((err) => console.log("Error signing user out ", err));
   };
 
+  const handleNav = (type) => nav.navigate("EditInformation", { type: type });
+
   if (loading || !fontsLoaded) {
     return (
       <View style={styles.container}>
@@ -68,18 +67,13 @@ const ProfileScreen = () => {
 
   return (
     <AppView style={{ flex: 1 }}>
-      {userProfile === null ? (
+      {!userProfile ? (
         <View style={styles.container}>
-          <AppText
-            style={{ fontSize: moderateScale(17.5), marginBottom: scale(8) }}>
-            You're not signed in.
-          </AppText>
-          <AppButton
-            onPress={() => nav.navigate("Login")}
-            buttonContainerStyle={{ width: moderateScale(180) }}
-            bgColor={colors.primary}
-            btnText="Click to sign in"
-          />
+          <TouchableOpacity onPress={() => nav.navigate("Login")}>
+            <Text style={{ color: colors.primary, fontWeight: "bold" }}>
+              Sign in to view your profile
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <>
@@ -141,27 +135,19 @@ const ProfileScreen = () => {
             }}>
             <View style={{ marginBottom: scale(20) }}>
               <TouchableCard
-                onPress={() =>
-                  nav.navigate("EditInformation", { type: "profile" })
-                }
+                onPress={() => handleNav("profile")}
                 name="Personal Information"
               />
               <TouchableCard
-                onPress={() =>
-                  nav.navigate("EditInformation", { type: "address" })
-                }
+                onPress={() => handleNav("address")}
                 name="Saved Address"
               />
               <TouchableCard
-                onPress={() =>
-                  nav.navigate("EditInformation", { type: "payment" })
-                }
+                onPress={() => handleNav("payment")}
                 name="Payment Method"
               />
               <TouchableCard
-                onPress={() =>
-                  nav.navigate("EditInformation", { type: "rewards" })
-                }
+                onPress={() => alert("Coming in the future")}
                 name="Rewards"
               />
               <TouchableCard

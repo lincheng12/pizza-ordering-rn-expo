@@ -1,12 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import moment from "moment";
 
@@ -32,14 +25,6 @@ export const getAllOrdersById = createAsyncThunk(
             queryLastOrder.data().timePlaced.toDate()
           ).format(),
         };
-
-        //   console.log(
-        //     queryOrders.docs.map((doc) => ({
-        //       ...doc.data(),
-        //       timePlaced: moment(doc.data().timePlaced.toDate()).format(),
-        //     }))
-        //   );
-        //console.log(lastOrder.data());
         return [orders, lastOrder];
       } else return [[], {}];
     } catch (err) {
@@ -53,11 +38,9 @@ export const storeOrdersById = createAsyncThunk(
   async (payload, { getState, rejectWithValue }) => {
     try {
       const { id } = getState().user.profile;
-      //   const { timePlaced } = payload;
       const date = moment.utc().format();
       await setDoc(doc(db, "users", id, "orders", payload.id), payload);
       await setDoc(doc(db, "users", id, "last-order", "last"), payload);
-      //   console.log("time: ", timePlaced);
       return {
         ...payload,
         timePlaced: moment.utc(date).local().format(),

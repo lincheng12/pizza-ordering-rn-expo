@@ -4,8 +4,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { LogBox } from "react-native";
 import { ThemeProvider } from "./src/hooks/useThemePreference";
-import store from "./src/redux/store";
+import { store, persistor } from "./src/redux/store";
 import AppStack from "./src/routes/AppStack";
+import { PersistGate } from "redux-persist/integration/react";
 
 LogBox.ignoreLogs([
   "AsyncStorage has been extracted from react-native core and will be removed in a future release. It can now be installed and imported from '@react-native-async-storage/async-storage' instead of 'react-native'.",
@@ -24,7 +25,9 @@ export default function App() {
     <ThemeProvider>
       <SafeAreaProvider>
         <Provider store={store}>
-          <AppStack />
+          <PersistGate loading={null} persistor={persistor}>
+            <AppStack />
+          </PersistGate>
         </Provider>
       </SafeAreaProvider>
     </ThemeProvider>

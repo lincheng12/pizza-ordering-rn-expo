@@ -31,7 +31,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppButton from "../components/AppButton";
 import { Controller, useForm } from "react-hook-form";
 import PaperTextInput from "../components/PaperTextInput";
-import { selectUser } from "../redux/slices/userSlice";
+import { selectUser, updateUserById } from "../redux/slices/userSlice";
 import { Switch } from "react-native-paper";
 import uuid from "react-native-uuid";
 import { serverTimestamp } from "firebase/firestore";
@@ -56,42 +56,56 @@ const CheckoutScreen = ({ route }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fname: userProfile.fname,
-      lname: userProfile.lname,
-      email: userProfile.email,
-      phone: userProfile.phone,
-      address: userProfile.address,
-      city: userProfile.city,
-      state: userProfile.state,
-      zipcode: userProfile.zipcode,
-      card: userProfile.card,
-      cvv: userProfile.cvv,
+      fname: userProfile ? userProfile.fname : "",
+      lname: userProfile ? userProfile.lname : "",
+      email: userProfile ? userProfile.email : "",
+      phone: userProfile ? userProfile.phone : "",
+      address: userProfile ? userProfile.address : "",
+      city: userProfile ? userProfile.city : "",
+      state: userProfile ? userProfile.state : "",
+      zipcode: userProfile ? userProfile.zipcode : "",
+      card: userProfile ? userProfile.card : "",
+      cvv: userProfile ? userProfile.cvv : "",
     },
   });
 
   const onSubmit = (data) => {
+    const price = type === "single" ? item.price * item.quantity : pizzaTotal;
+    let rewards = Math.floor(price / 15);
     const orderObj = {
       id: uuid.v4(),
       items: type === "single" ? [item] : pizzaItems,
       meta: { ...data },
       delivery: isDelivery,
-      price: type === "single" ? item.price * item.quantity : pizzaTotal,
+      price,
       timePlaced: serverTimestamp(),
     };
 
-    dispatch(storeOrdersById(orderObj))
-      .unwrap()
-      .then(() => {
-        // console.log("result: ", promiseResult);
-        if (type === "multiple") {
-          dispatch(clearBasket());
-        }
-        alert("Your order was successfully placed");
-        nav.dispatch(StackActions.popToTop());
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (userProfile) {
+      if (userProfile.rewards + rewards >= 12) {
+        dispatch(updateUserById({ rewards }));
+      } else {
+        rewards = userProfile.rewards + rewards;
+        dispatch(updateUserById({ rewards }));
+      }
+
+      dispatch(storeOrdersById(orderObj))
+        .unwrap()
+        .then(() => {
+          // console.log("result: ", promiseResult);
+          if (type === "multiple") {
+            dispatch(clearBasket());
+          }
+          alert("Your order was successfully placed");
+          nav.dispatch(StackActions.popToTop());
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      alert("Your order was successfully placed");
+      nav.dispatch(StackActions.popToTop());
+    }
   };
 
   return (

@@ -3,47 +3,40 @@ import {
   View,
   ScrollView,
   Image,
-  Platform,
   TouchableOpacity,
   Text,
-  Pressable,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import AppView from "../components/AppView";
 import AppText from "../components/AppText";
-import {
-  moderateScale,
-  scale,
-  shadowStyle,
-  verticalScale,
-  wHeight,
-} from "../assets/Styles";
+import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import { pizzData } from "../assets/pizza_data";
 import {
   useNavigation,
   useTheme,
   useIsFocused,
+  TabActions,
 } from "@react-navigation/native";
 import { Foundation, Entypo } from "@expo/vector-icons";
 import AppTouchable from "../components/AppTouchable";
 import PizzaCard from "../components/PizzaCard";
 import AppButton from "../components/AppButton";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectLastOrder } from "../redux/slices/orderSlice";
 import { selectUser } from "../redux/slices/userSlice";
 import moment from "moment";
-import Modal from "react-native-modal";
+import { addToBasket } from "../redux/slices/basketSlice";
 
 const HomeScreen = () => {
   const { colors } = useTheme();
   const nav = useNavigation();
   const userProfile = useSelector(selectUser);
   const lastOrder = useSelector(selectLastOrder);
-  const [visible, setVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
   const isFocused = useIsFocused();
   const mainScrollRef = useRef(null);
   const lastOrderRef = useRef(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isFocused) {
@@ -58,20 +51,6 @@ const HomeScreen = () => {
       setTimeoutId(id);
     }
   }, [isFocused]);
-
-  const toggleModal = () => setVisible(!visible);
-
-  // const scrollDirection = (event) => {
-  //   const offsetX = event.nativeEvent.contentOffset.x;
-  //   const dif = offsetX - 0;
-  //   console.log("dif", dif);
-  //   if (dif == 200) {
-  //     alert("destination reached");
-  //   }
-
-  //   // setOffset(offsetX);
-  //   console.log(offsetX);
-  // };
 
   return (
     <AppView style={{ flex: 1 }}>
@@ -149,47 +128,18 @@ const HomeScreen = () => {
           {/* Last order header starts */}
           <View style={styles.headerTopContainer}>
             <AppText style={styles.heading}>Last order</AppText>
-            <TouchableOpacity disabled={!userProfile} onPress={toggleModal}>
+            <TouchableOpacity
+              disabled={!userProfile}
+              onPress={() => nav.dispatch(TabActions.jumpTo("Orders"))}>
               <AppText
                 style={{
                   color: !userProfile ? "#aaa" : colors.primary,
                   marginRight: scale(8),
                   fontSize: scale(14.5),
                 }}>
-                Summary
+                Details
               </AppText>
             </TouchableOpacity>
-            <Modal
-              useNativeDriver
-              useNativeDriverForBackdrop
-              animationIn="slideInDown"
-              animationOut="slideOutUp"
-              isVisible={visible}
-              onBackdropPress={toggleModal}>
-              <View
-                style={{
-                  position: "relative",
-                  width: scale(300),
-                  height: scale(400),
-                  backgroundColor: colors.card,
-                  borderRadius: 10,
-                }}>
-                <Pressable
-                  onPress={toggleModal}
-                  style={{
-                    position: "absolute",
-                    backgroundColor: colors.notification,
-                    padding: scale(10),
-                    top: scale(-12),
-                    right: scale(-10),
-                    borderRadius: 50,
-                    zIndex: 20,
-                  }}>
-                  <Entypo name="cross" size={24} color="white" />
-                </Pressable>
-                <AppText>Hello</AppText>
-              </View>
-            </Modal>
           </View>
           {/* Last order header ends */}
 
@@ -224,7 +174,6 @@ const HomeScreen = () => {
                           height: scale(120),
                           marginHorizontal: scale(6),
                           width: scale(230),
-                          // marginHorizontal: scale(8),
                           padding: scale(10),
                           borderRadius: 10,
                           justifyContent: "space-between",
@@ -245,6 +194,7 @@ const HomeScreen = () => {
                         </AppText>
                       </View>
                       <AppButton
+                        onPress={() => dispatch(addToBasket(item))}
                         buttonContainerStyle={{
                           paddingVertical: scale(7.5),
                         }}
@@ -262,7 +212,9 @@ const HomeScreen = () => {
                     alignItems: "center",
                     justifyContent: "center",
                   }}>
-                  <Text>Looks like you have not place any order yet</Text>
+                  <AppText style={{ marginBottom: scale(5) }}>
+                    Looks like you have not place any order yet
+                  </AppText>
                   <TouchableOpacity
                     onPress={() => nav.navigate("PizzaSelectionDetails")}>
                     <Text style={{ color: colors.primary, fontWeight: "bold" }}>
@@ -371,7 +323,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // backgroundColor: "pink",
   },
   horizontalScrollContainer: {
     paddingVertical: scale(2),

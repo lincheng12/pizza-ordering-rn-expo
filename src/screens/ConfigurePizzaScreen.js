@@ -1,12 +1,9 @@
 import {
-  Alert,
   StyleSheet,
-  Text,
   View,
   Image,
   ScrollView,
   TouchableOpacity,
-  TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import AppView from "../components/AppView";
@@ -16,7 +13,7 @@ import { RadioButton } from "react-native-paper";
 import { capitalize, formatPrice, mapSauces, mapToppings } from "../lib/helper";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import usePreviousState from "../hooks/usePreviousState";
 import RadioItemCard from "../components/RadioItemCard";
@@ -26,6 +23,7 @@ import { addToBasket, selectTotalCount } from "../redux/slices/basketSlice";
 import QuantityCounter from "../components/QuantityCounter";
 import AppButton from "../components/AppButton";
 import * as Haptics from "expo-haptics";
+import { selectUser } from "../redux/slices/userSlice";
 
 const ConfigurePizzaScreen = ({ route }) => {
   const { item, startPrice } = route.params;
@@ -41,8 +39,10 @@ const ConfigurePizzaScreen = ({ route }) => {
   const prevSizeIndex = usePreviousState(sizeIndex);
   const prevCrustIndex = usePreviousState(crustIndex);
   const totalCount = useSelector(selectTotalCount);
+  const userProfile = useSelector(selectUser);
   const dispatch = useDispatch();
   const nav = useNavigation();
+  const [name] = useState(item?.name);
 
   useEffect(() => {
     let totalCost = price;
@@ -89,11 +89,10 @@ const ConfigurePizzaScreen = ({ route }) => {
     }
   };
 
-  const addPizza = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const name = item?.name;
+  const pizzaObj = () => {
+    let item;
     if (ingredients.length > 0) {
-      const item = {
+      item = {
         id: uuid.v4(),
         pizzaName: name !== undefined ? name : "Custom Pizza",
         pizzaBase: [sizeIndex, crustIndex],
@@ -101,26 +100,23 @@ const ConfigurePizzaScreen = ({ route }) => {
         quantity,
         price,
       };
-      dispatch(addToBasket(item));
-      nav.goBack();
-      //console.log(item);
-    } else Alert.alert("Cannot add empty items to the basket");
+    } else alert("Pizza is not properly configure");
+    return item;
+  };
+
+  const addPizza = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const item = pizzaObj();
+    dispatch(addToBasket(item));
+    nav.goBack();
   };
 
   const checkoutSinglePizza = () => {
+    if (!userProfile)
+      alert("You are not logged in, so your order will not be save.");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const name = item?.name;
-    if (ingredients.length > 0) {
-      const item = {
-        id: uuid.v4(),
-        pizzaName: name !== undefined ? name : "Custom Pizza",
-        pizzaBase: [sizeIndex, crustIndex],
-        pizzaDetails: ingredients,
-        quantity,
-        price,
-      };
-      nav.navigate("Checkout", { item, type: "single" });
-    } else Alert.alert("Cannot checkout empty items");
+    const item = pizzaObj();
+    nav.navigate("Checkout", { item, type: "single" });
   };
 
   return (
@@ -138,49 +134,23 @@ const ConfigurePizzaScreen = ({ route }) => {
             style={{
               height: 140,
               width: "100%",
-              marginBottom: scale(-10),
+              marginBottom: scale(-5),
             }}
             resizeMode="contain"
             source={require("../assets/pizza_backdrop.png")}
           />
         )}
         <View style={{ marginLeft: scale(5), marginVertical: scale(3) }}>
-          {item ? (
-            <>
-              <AppText
-                style={{ fontSize: moderateScale(22), fontWeight: "bold" }}>
-                {item.name}
-              </AppText>
-            </>
-          ) : (
-            <>
-              <AppText style={styles.selectionHeading}>Name:</AppText>
-              <TextInput
-                style={{
-                  backgroundColor: colors.card,
-                  height: 45,
-                  paddingVertical: scale(12),
-                  paddingHorizontal: scale(10),
-                  color: colors.text,
-                  fontSize: moderateScale(15),
-                  borderRadius: 10,
-                }}
-                placeholderTextColor={colors.text}
-                placeholder="Name of your custom pizza"
-              />
-            </>
-          )}
-          {ingredients.length !== 0 ? (
-            <AppText
-              style={{
-                color: colors.primary,
-                paddingTop: scale(2),
-              }}>
-              {ingredients.join(", ")}
-            </AppText>
-          ) : (
-            <AppText style={{ color: colors.primary }}>Ingredients</AppText>
-          )}
+          <AppText style={{ fontSize: moderateScale(22), fontWeight: "bold" }}>
+            {item ? item.name : "Custom Pizza"}
+          </AppText>
+          <AppText
+            style={{
+              color: colors.primary,
+              paddingTop: scale(2),
+            }}>
+            {ingredients.length !== 0 ? ingredients.join(", ") : "Ingredients"}
+          </AppText>
         </View>
         <View style={{ padding: scale(5) }}>
           {/* Pizza size type */}
@@ -270,41 +240,32 @@ const ConfigurePizzaScreen = ({ route }) => {
       </ScrollView>
       {/* bottom page container */}
       <View style={styles.footer}>
-        <View style={styles.circleButtonContainer}>
-          <TouchableOpacity
-            style={[styles.circleButton, { backgroundColor: "#F08080" }]}>
-            <AntDesign name="hearto" size={22} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={addPizza}
-            style={[
-              styles.circleButton,
-              { backgroundColor: colors.card, position: "relative" },
-            ]}>
-            {totalCount !== 0 && (
-              <View
-                style={[
-                  {
-                    backgroundColor: colors.notification,
-                    width: 20,
-                    height: 20,
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    borderRadius: 20 / 2,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                  shadowStyle,
-                ]}>
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  {totalCount}
-                </Text>
-              </View>
-            )}
+        {/* <View style={styles.circleButtonContainer}> */}
+        <TouchableOpacity
+          onPress={addPizza}
+          style={[
+            styles.circleButton,
+            { backgroundColor: colors.card },
+            shadowStyle,
+          ]}>
+          {/* {totalCount !== 0 && (
+            <View
+              style={[
+                { backgroundColor: colors.notification },
+                shadowStyle,
+                styles.countBadge,
+              ]}>
+              <Text style={{ color: "white", fontWeight: "bold" }}>
+                {totalCount}
+              </Text>
+            </View>
+          )} */}
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons name="basket" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
+            <AppText style={{ marginLeft: scale(5) }}>{totalCount}</AppText>
+          </View>
+        </TouchableOpacity>
+        {/* </View> */}
         <AppButton
           onPress={checkoutSinglePizza}
           buttonContainerStyle={styles.checkoutButton}
@@ -327,7 +288,8 @@ const styles = StyleSheet.create({
   },
   circleButton: {
     padding: scale(10),
-    borderRadius: 50,
+    width: "25%",
+    borderRadius: 10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -338,7 +300,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10,
     width: "70%",
-    marginRight: scale(5),
+    //marginRight: scale(5),
     flexDirection: "row",
     height: 45,
   },
@@ -346,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: scale(8),
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
   },
   circleButtonContainer: {
     flexDirection: "row",
@@ -358,5 +320,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: scale(10),
+  },
+  countBadge: {
+    width: 20,
+    height: 20,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    borderRadius: 20 / 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

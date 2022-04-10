@@ -18,12 +18,14 @@ import { moderateScale, scale, shadowStyle } from "../assets/Styles";
 import BasketCard from "../components/BasketCard";
 import AppButton from "../components/AppButton";
 import * as Haptics from "expo-haptics";
+import { selectUser } from "../redux/slices/userSlice";
 
 const BasketScreen = () => {
   const { colors } = useTheme();
   const pizzaItems = useSelector(selectItems);
   const totalCost = useSelector(selectTotal);
   const totalCount = useSelector(selectTotalCount);
+  const userProfile = useSelector(selectUser);
   const dispatch = useDispatch();
   const nav = useNavigation();
 
@@ -47,6 +49,8 @@ const BasketScreen = () => {
   };
 
   const checkout = () => {
+    if (!userProfile)
+      alert("You are not logged in, so your order will not be save.");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     nav.navigate("Checkout", { type: "multiple" });
   };

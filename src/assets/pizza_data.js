@@ -76,5 +76,7 @@ export const returnPizzaImage = (name) => {
       return require("./chicken_pizza.png");
     case "Glaze Pizza":
       return require("./glaze_pizza.png");
+    default:
+      return require("./pizza_backdrop.png");
   }
 };

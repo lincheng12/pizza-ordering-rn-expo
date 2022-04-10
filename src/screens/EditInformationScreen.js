@@ -76,9 +76,11 @@ const EditInformationScreen = ({ route }) => {
       }),
       {}
     );
-    return isDirty
-      ? dispatch(updateUserById(res))
-      : alert("No fields has change.");
+    if (isDirty)
+      dispatch(updateUserById(res))
+        .unwrap()
+        .then(() => alert("Information updated successfully"));
+    else alert("No fields has change.");
   };
 
   return (

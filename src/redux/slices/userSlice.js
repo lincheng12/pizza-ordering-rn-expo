@@ -11,14 +11,12 @@ export const getUserById = createAsyncThunk(
       dispatch(getAllOrdersById(userId));
       const profileObj = await getDoc(doc(db, "users", userId));
       if (profileObj.exists()) {
-        //console.log(profileObj.data());
         const res = profileObj.data();
         const createdAt = moment(res?.createdAt?.toDate()).toString();
         return { ...res, createdAt };
       }
     } catch (err) {
-      console.log(err);
-      return rejectWithValue("User does not exist with that userId ", err);
+      return rejectWithValue(err);
     }
   }
 );
@@ -44,16 +42,9 @@ export const userSlice = createSlice({
     updating: false,
   },
   reducers: {
-    login: (state, action) => {
-      //kind of useless
-      state.profile = action.payload;
-    },
     logout: (state) => {
       state.profile = null;
     },
-    // update: (state, { payload }) => {
-    //   state.profile = { ...state.profile, ...payload }; //override part of previous stored state
-    // },
   },
   extraReducers: {
     [getUserById.pending]: (state) => {
@@ -73,7 +64,6 @@ export const userSlice = createSlice({
     [updateUserById.fulfilled]: (state, { payload }) => {
       state.updating = false;
       state.profile = { ...state.profile, ...payload };
-      alert("Information updated successfully");
     },
     [updateUserById.rejected]: (state, action) => {
       state.updating = false;
@@ -82,7 +72,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { logout } = userSlice.actions;
 export const selectUser = (state) => state.user.profile;
 export const selectLoading = (state) => state.user.loading;
 export const selectUpdating = (state) => state.user.updating;
