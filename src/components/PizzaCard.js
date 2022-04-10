@@ -2,14 +2,17 @@ import { StyleSheet, View, Platform, Image } from "react-native";
 import React from "react";
 import AppText from "./AppText";
 import { moderateScale, scale, shadowStyle } from "../assets/Styles";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import AppTouchable from "./AppTouchable";
 import { formatPrice } from "../lib/helper";
 
 const PizzaCard = (props) => {
+  const { item } = props;
   const { colors } = useTheme();
+  const nav = useNavigation();
+
   return (
-    <AppTouchable onPress={props.onPress}>
+    <AppTouchable onPress={() => nav.navigate("ConfigurePizza", { item })}>
       <View
         style={[
           styles.cardContainer,
@@ -20,15 +23,14 @@ const PizzaCard = (props) => {
         <Image
           resizeMode="cover"
           style={[styles.image, props.pizzaImageStyle]}
-          source={props.image}
-          // source={{ uri: props.image }}
+          source={item.image}
         />
         <View style={styles.titleAndPriceContainer}>
           <AppText {...props} style={[styles.name, props.pizzaNameStyle]}>
-            {props.name}
+            {item.name}
           </AppText>
           <AppText style={[styles.price, props.pizzaPriceStyle]}>
-            +{formatPrice(props.price)}
+            +{formatPrice(item.price)}
           </AppText>
         </View>
         <AppText
@@ -45,7 +47,7 @@ const PizzaCard = (props) => {
             { marginLeft: scale(5), fontSize: moderateScale(11.5) },
             props.ingredientsStyle,
           ]}>
-          {props.ingredients.join(", ")}
+          {item.ingredients.join(", ")}
         </AppText>
       </View>
     </AppTouchable>

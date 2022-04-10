@@ -40,23 +40,44 @@ const HomeScreen = () => {
   const userProfile = useSelector(selectUser);
   const lastOrder = useSelector(selectLastOrder);
   const [visible, setVisible] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(null);
   const isFocused = useIsFocused();
   const mainScrollRef = useRef(null);
   const lastOrderRef = useRef(null);
 
   useEffect(() => {
     if (isFocused) {
-      mainScrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       lastOrderRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      //clear the timeout so that it doesn't auto scroll after 1 minute
+      clearTimeout(timeoutId);
+    } else {
+      //after 1 minute, if user has not returned to home screen, the scroll view will auto scroll to top
+      const id = setTimeout(() => {
+        mainScrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      }, 60000);
+      setTimeoutId(id);
     }
   }, [isFocused]);
 
   const toggleModal = () => setVisible(!visible);
 
+  // const scrollDirection = (event) => {
+  //   const offsetX = event.nativeEvent.contentOffset.x;
+  //   const dif = offsetX - 0;
+  //   console.log("dif", dif);
+  //   if (dif == 200) {
+  //     alert("destination reached");
+  //   }
+
+  //   // setOffset(offsetX);
+  //   console.log(offsetX);
+  // };
+
   return (
     <AppView style={{ flex: 1 }}>
       <ScrollView
         ref={mainScrollRef}
+        // onScroll={scrollDirection}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{}}
         style={{ flex: 1 }}>
@@ -90,12 +111,8 @@ const HomeScreen = () => {
                   marginHorizontal: scale(3),
                 }}
                 pizzaImageStyle={{ width: moderateScale(200), height: "65%" }}
-                image={item.image}
-                name={item.name}
-                price={item.price}
-                ingredients={item.ingredients}
                 numberOfLines={1}
-                onPress={() => nav.navigate("ConfigurePizza", { item })}
+                item={item}
               />
             ))}
             <AppTouchable

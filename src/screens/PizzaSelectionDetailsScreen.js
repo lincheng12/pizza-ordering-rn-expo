@@ -51,11 +51,7 @@ const PizzaSelectionDetailsScreen = () => {
               marginTop: "1%",
             }}
             ingredientsStyle={{ fontSize: 12.5 }}
-            image={item.image}
-            name={item.name}
-            price={item.price}
-            ingredients={item.ingredients}
-            onPress={() => nav.navigate("ConfigurePizza", { item })}
+            item={item}
           />
         ))}
       </ScrollView>
