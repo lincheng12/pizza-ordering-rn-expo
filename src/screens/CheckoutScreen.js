@@ -400,10 +400,6 @@ const CheckoutScreen = ({ route }) => {
             rules={{
               required: "Field cannot be empty",
               minLength: 9,
-              pattern: {
-                value: /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/,
-                message: "Not a valid phone input",
-              },
             }}
             render={({ field: { onChange, value } }) => (
               <PaperTextInput

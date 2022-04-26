@@ -371,7 +371,7 @@ const RegisterScreen = () => {
               required: "Field cannot be empty",
               minLength: 9,
               pattern: {
-                value: /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/,
+                value: phoneRegex,
                 message: "Not a valid phone input",
               },
             }}

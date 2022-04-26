@@ -101,7 +101,7 @@ const LoginScreen = () => {
                 },
                 shadowStyle,
               ]}>
-              Mar's Pizzeria
+              Mars Pizzeria
             </AppText>
           </View>
           <View
