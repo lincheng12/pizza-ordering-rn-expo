@@ -39,6 +39,7 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    debugger;
     if (isFocused) {
       lastOrderRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       //clear the timeout so that it doesn't auto scroll after 1 minute
