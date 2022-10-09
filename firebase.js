@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAbrkRYKQbJQpHglY_aXFmpui0Ltn6oFmU",
-  authDomain: "pizza-ordering-rn.firebaseapp.com",
-  projectId: "pizza-ordering-rn",
-  storageBucket: "pizza-ordering-rn.appspot.com",
-  messagingSenderId: "939814523232",
-  appId: "1:939814523232:web:fe31cbb6ea070d715d4e05",
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "...",
 };
 
 // Initialize Firebase
